@@ -43,7 +43,7 @@ const getProducts = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getProductById = catchAsync(async (req: Request, res: Response) => {
-  const result = await ProductService.getProductByIdFromDB(req.params.id);
+  const result = await ProductService.getProductByIdFromDB(req.params.id as string);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -66,7 +66,7 @@ const updateProduct = catchAsync(async (req: Request, res: Response) => {
   const variants: IVariantInput[] | undefined = payload.variants;
   delete payload.variants;
 
-  const result = await ProductService.updateProductInDB(req.params.id, payload, variants);
+  const result = await ProductService.updateProductInDB(req.params.id as string, payload, variants);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -76,7 +76,7 @@ const updateProduct = catchAsync(async (req: Request, res: Response) => {
 });
 
 const deleteProduct = catchAsync(async (req: Request, res: Response) => {
-  await ProductService.deleteProductFromDB(req.params.id);
+  await ProductService.deleteProductFromDB(req.params.id as string);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -86,7 +86,7 @@ const deleteProduct = catchAsync(async (req: Request, res: Response) => {
 });
 
 const toggleProductStatus = catchAsync(async (req: Request, res: Response) => {
-  const result = await ProductService.toggleProductStatusInDB(req.params.id);
+  const result = await ProductService.toggleProductStatusInDB(req.params.id as string);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,

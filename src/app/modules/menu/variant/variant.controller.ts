@@ -30,7 +30,7 @@ const getVariantCategories = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getVariantCategoryById = catchAsync(async (req: Request, res: Response) => {
-  const result = await VariantService.getVariantCategoryByIdFromDB(req.params.id);
+  const result = await VariantService.getVariantCategoryByIdFromDB(req.params.id as string);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -40,7 +40,7 @@ const getVariantCategoryById = catchAsync(async (req: Request, res: Response) =>
 });
 
 const updateVariantCategory = catchAsync(async (req: Request, res: Response) => {
-  const result = await VariantService.updateVariantCategoryInDB(req.params.id, req.body);
+  const result = await VariantService.updateVariantCategoryInDB(req.params.id as string, req.body);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -50,7 +50,7 @@ const updateVariantCategory = catchAsync(async (req: Request, res: Response) => 
 });
 
 const deleteVariantCategory = catchAsync(async (req: Request, res: Response) => {
-  await VariantService.deleteVariantCategoryFromDB(req.params.id);
+  await VariantService.deleteVariantCategoryFromDB(req.params.id as string);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -60,7 +60,7 @@ const deleteVariantCategory = catchAsync(async (req: Request, res: Response) => 
 });
 
 const toggleVariantCategoryStatus = catchAsync(async (req: Request, res: Response) => {
-  const result = await VariantService.toggleVariantCategoryStatusInDB(req.params.id);
+  const result = await VariantService.toggleVariantCategoryStatusInDB(req.params.id as string);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -95,7 +95,7 @@ const getVariantItems = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getVariantItemById = catchAsync(async (req: Request, res: Response) => {
-  const result = await VariantService.getVariantItemByIdFromDB(req.params.id);
+  const result = await VariantService.getVariantItemByIdFromDB(req.params.id as string);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -105,7 +105,7 @@ const getVariantItemById = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateVariantItem = catchAsync(async (req: Request, res: Response) => {
-  const result = await VariantService.updateVariantItemInDB(req.params.id, req.body);
+  const result = await VariantService.updateVariantItemInDB(req.params.id as string, req.body);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -115,7 +115,7 @@ const updateVariantItem = catchAsync(async (req: Request, res: Response) => {
 });
 
 const deleteVariantItem = catchAsync(async (req: Request, res: Response) => {
-  await VariantService.deleteVariantItemFromDB(req.params.id);
+  await VariantService.deleteVariantItemFromDB(req.params.id as string);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -125,7 +125,7 @@ const deleteVariantItem = catchAsync(async (req: Request, res: Response) => {
 });
 
 const toggleVariantItemStatus = catchAsync(async (req: Request, res: Response) => {
-  const result = await VariantService.toggleVariantItemStatusInDB(req.params.id);
+  const result = await VariantService.toggleVariantItemStatusInDB(req.params.id as string);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,

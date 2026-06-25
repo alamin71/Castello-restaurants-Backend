@@ -36,7 +36,7 @@ const getCategories = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getCategoryById = catchAsync(async (req: Request, res: Response) => {
-  const result = await CategoryService.getCategoryByIdFromDB(req.params.id);
+  const result = await CategoryService.getCategoryByIdFromDB(req.params.id as string);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -51,7 +51,7 @@ const updateCategory = catchAsync(async (req: Request, res: Response) => {
   if (files?.image?.[0]) {
     payload.image = await uploadToS3(files.image[0], 'categories');
   }
-  const result = await CategoryService.updateCategoryInDB(req.params.id, payload);
+  const result = await CategoryService.updateCategoryInDB(req.params.id as string, payload);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -61,7 +61,7 @@ const updateCategory = catchAsync(async (req: Request, res: Response) => {
 });
 
 const deleteCategory = catchAsync(async (req: Request, res: Response) => {
-  await CategoryService.deleteCategoryFromDB(req.params.id);
+  await CategoryService.deleteCategoryFromDB(req.params.id as string);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -71,7 +71,7 @@ const deleteCategory = catchAsync(async (req: Request, res: Response) => {
 });
 
 const toggleCategoryStatus = catchAsync(async (req: Request, res: Response) => {
-  const result = await CategoryService.toggleCategoryStatusInDB(req.params.id);
+  const result = await CategoryService.toggleCategoryStatusInDB(req.params.id as string);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,

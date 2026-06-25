@@ -30,7 +30,7 @@ const getToppingCategories = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getToppingCategoryById = catchAsync(async (req: Request, res: Response) => {
-  const result = await ToppingService.getToppingCategoryByIdFromDB(req.params.id);
+  const result = await ToppingService.getToppingCategoryByIdFromDB(req.params.id as string);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -40,7 +40,7 @@ const getToppingCategoryById = catchAsync(async (req: Request, res: Response) =>
 });
 
 const updateToppingCategory = catchAsync(async (req: Request, res: Response) => {
-  const result = await ToppingService.updateToppingCategoryInDB(req.params.id, req.body);
+  const result = await ToppingService.updateToppingCategoryInDB(req.params.id as string, req.body);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -50,7 +50,7 @@ const updateToppingCategory = catchAsync(async (req: Request, res: Response) => 
 });
 
 const deleteToppingCategory = catchAsync(async (req: Request, res: Response) => {
-  await ToppingService.deleteToppingCategoryFromDB(req.params.id);
+  await ToppingService.deleteToppingCategoryFromDB(req.params.id as string);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -60,7 +60,7 @@ const deleteToppingCategory = catchAsync(async (req: Request, res: Response) => 
 });
 
 const toggleToppingCategoryStatus = catchAsync(async (req: Request, res: Response) => {
-  const result = await ToppingService.toggleToppingCategoryStatusInDB(req.params.id);
+  const result = await ToppingService.toggleToppingCategoryStatusInDB(req.params.id as string);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -95,7 +95,7 @@ const getToppingItems = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getToppingItemById = catchAsync(async (req: Request, res: Response) => {
-  const result = await ToppingService.getToppingItemByIdFromDB(req.params.id);
+  const result = await ToppingService.getToppingItemByIdFromDB(req.params.id as string);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -105,7 +105,7 @@ const getToppingItemById = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateToppingItem = catchAsync(async (req: Request, res: Response) => {
-  const result = await ToppingService.updateToppingItemInDB(req.params.id, req.body);
+  const result = await ToppingService.updateToppingItemInDB(req.params.id as string, req.body);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -115,7 +115,7 @@ const updateToppingItem = catchAsync(async (req: Request, res: Response) => {
 });
 
 const deleteToppingItem = catchAsync(async (req: Request, res: Response) => {
-  await ToppingService.deleteToppingItemFromDB(req.params.id);
+  await ToppingService.deleteToppingItemFromDB(req.params.id as string);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -125,7 +125,7 @@ const deleteToppingItem = catchAsync(async (req: Request, res: Response) => {
 });
 
 const toggleToppingItemStatus = catchAsync(async (req: Request, res: Response) => {
-  const result = await ToppingService.toggleToppingItemStatusInDB(req.params.id);
+  const result = await ToppingService.toggleToppingItemStatusInDB(req.params.id as string);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,

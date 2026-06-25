@@ -39,7 +39,7 @@ const getOffers = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getOfferById = catchAsync(async (req: Request, res: Response) => {
-  const result = await OfferService.getOfferByIdFromDB(req.params.id);
+  const result = await OfferService.getOfferByIdFromDB(req.params.id as string);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -59,7 +59,7 @@ const updateOffer = catchAsync(async (req: Request, res: Response) => {
     payload.gallery = await uploadMultipleToS3(files.gallery, 'offers/gallery');
   }
 
-  const result = await OfferService.updateOfferInDB(req.params.id, payload);
+  const result = await OfferService.updateOfferInDB(req.params.id as string, payload);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -69,7 +69,7 @@ const updateOffer = catchAsync(async (req: Request, res: Response) => {
 });
 
 const deleteOffer = catchAsync(async (req: Request, res: Response) => {
-  await OfferService.deleteOfferFromDB(req.params.id);
+  await OfferService.deleteOfferFromDB(req.params.id as string);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -79,7 +79,7 @@ const deleteOffer = catchAsync(async (req: Request, res: Response) => {
 });
 
 const toggleOfferStatus = catchAsync(async (req: Request, res: Response) => {
-  const result = await OfferService.toggleOfferStatusInDB(req.params.id);
+  const result = await OfferService.toggleOfferStatusInDB(req.params.id as string);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
