@@ -1,0 +1,1313 @@
+{
+  "info": {
+    "_postman_id": "castello-restaurant-management-api",
+    "name": "Castello Restaurant Management API",
+    "description": "Complete API collection for Castello Restaurant Management System.\n\n**Setup:**\n1. Set `baseUrl` variable to your server (default: http://localhost:5000/api/v1)\n2. Run **Admin Login** → `adminToken` is auto-saved\n3. Run **User Login** → `token` is auto-saved\n\n**Currency:** ISK (kr) — Iceland",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl",      "value": "http://localhost:5000/api/v1", "type": "string" },
+    { "key": "token",        "value": "", "type": "string" },
+    { "key": "adminToken",   "value": "", "type": "string" },
+    { "key": "refreshToken", "value": "", "type": "string" },
+    { "key": "otpToken",     "value": "", "type": "string" },
+    { "key": "resetToken",   "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Auth (Customer)",
+      "item": [
+        {
+          "name": "Signup",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"Password@123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/auth/signup", "host": ["{{baseUrl}}"], "path": ["auth", "signup"] }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.accessToken) {",
+                  "  pm.collectionVariables.set('token', res.data.accessToken);",
+                  "  pm.collectionVariables.set('refreshToken', res.data.refreshToken);",
+                  "  console.log('User token saved');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"Password@123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/auth/refresh-token", "host": ["{{baseUrl}}"], "path": ["auth", "refresh-token"] }
+          }
+        },
+        {
+          "name": "Forgot Password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.otpToken) {",
+                  "  pm.collectionVariables.set('otpToken', res.data.otpToken);",
+                  "  console.log('OTP token saved');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/auth/forgot-password", "host": ["{{baseUrl}}"], "path": ["auth", "forgot-password"] }
+          }
+        },
+        {
+          "name": "Verify OTP",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.resetToken) {",
+                  "  pm.collectionVariables.set('resetToken', res.data.resetToken);",
+                  "  console.log('Reset token saved');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "otp-token",    "value": "{{otpToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"otp\": 123456\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/auth/verify-otp", "host": ["{{baseUrl}}"], "path": ["auth", "verify-otp"] }
+          }
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "reset-token",  "value": "{{resetToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newPassword\": \"NewPassword@123\",\n  \"confirmPassword\": \"NewPassword@123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/auth/reset-password", "host": ["{{baseUrl}}"], "path": ["auth", "reset-password"] }
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"Password@123\",\n  \"newPassword\": \"NewPassword@123\",\n  \"confirmPassword\": \"NewPassword@123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/auth/change-password", "host": ["{{baseUrl}}"], "path": ["auth", "change-password"] }
+          }
+        },
+        {
+          "name": "Resend OTP",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/auth/resend-otp", "host": ["{{baseUrl}}"], "path": ["auth", "resend-otp"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "User Profile",
+      "item": [
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jane Doe\",\n  \"email\": \"jane@example.com\",\n  \"password\": \"Password@123\",\n  \"phone\": \"+354 555 1234\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/users/", "host": ["{{baseUrl}}"], "path": ["users", ""] }
+          }
+        },
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/users/profile", "host": ["{{baseUrl}}"], "path": ["users", "profile"] }
+          }
+        },
+        {
+          "name": "Update My Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name",  "value": "John Updated", "type": "text" },
+                { "key": "image", "type": "file", "src": "" }
+              ]
+            },
+            "url": { "raw": "{{baseUrl}}/users/profile", "host": ["{{baseUrl}}"], "path": ["users", "profile"] }
+          }
+        },
+        {
+          "name": "Delete My Account",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/users/delete", "host": ["{{baseUrl}}"], "path": ["users", "delete"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Auth",
+      "item": [
+        {
+          "name": "Admin Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.accessToken) {",
+                  "  pm.collectionVariables.set('adminToken', res.data.accessToken);",
+                  "  console.log('Admin token saved');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@castello.is\",\n  \"password\": \"Admin@1234\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/admin/login", "host": ["{{baseUrl}}"], "path": ["admin", "login"] }
+          }
+        },
+        {
+          "name": "Admin Forget Password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.otpToken) {",
+                  "  pm.collectionVariables.set('otpToken', res.data.otpToken);",
+                  "  console.log('Admin OTP token saved');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@castello.is\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/admin/forget-password", "host": ["{{baseUrl}}"], "path": ["admin", "forget-password"] }
+          }
+        },
+        {
+          "name": "Admin Verify Reset OTP",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.resetToken) {",
+                  "  pm.collectionVariables.set('resetToken', res.data.resetToken);",
+                  "  console.log('Admin reset token saved');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "otp-token",    "value": "{{otpToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"otp\": 123456\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/admin/verify-reset-otp", "host": ["{{baseUrl}}"], "path": ["admin", "verify-reset-otp"] }
+          }
+        },
+        {
+          "name": "Admin Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "reset-token",  "value": "{{resetToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newPassword\": \"Admin@1234\",\n  \"confirmPassword\": \"Admin@1234\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/admin/reset-password", "host": ["{{baseUrl}}"], "path": ["admin", "reset-password"] }
+          }
+        },
+        {
+          "name": "Admin Resend OTP",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@castello.is\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/admin/resend-otp", "host": ["{{baseUrl}}"], "path": ["admin", "resend-otp"] }
+          }
+        },
+        {
+          "name": "Admin Change Password",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"Admin@1234\",\n  \"newPassword\": \"Admin@5678\",\n  \"confirmPassword\": \"Admin@5678\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/admin/change-password", "host": ["{{baseUrl}}"], "path": ["admin", "change-password"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Management",
+      "item": [
+        {
+          "name": "Get All Admins [SUPER_ADMIN]",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/get-admin", "host": ["{{baseUrl}}"], "path": ["admin", "get-admin"] }
+          }
+        },
+        {
+          "name": "Get Admin Profile",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/profile", "host": ["{{baseUrl}}"], "path": ["admin", "profile"] }
+          }
+        },
+        {
+          "name": "Update Admin Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name",  "value": "Admin Updated", "type": "text" },
+                { "key": "image", "type": "file", "src": "" }
+              ]
+            },
+            "url": { "raw": "{{baseUrl}}/admin/profile/update", "host": ["{{baseUrl}}"], "path": ["admin", "profile", "update"] }
+          }
+        },
+        {
+          "name": "Remove Admin Profile Photo",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/profile/photo", "host": ["{{baseUrl}}"], "path": ["admin", "profile", "photo"] }
+          }
+        },
+        {
+          "name": "Delete Admin [SUPER_ADMIN]",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/admin/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", ":id"],
+              "variable": [{ "key": "id", "value": "ADMIN_OBJECT_ID_HERE" }]
+            }
+          }
+        },
+        {
+          "name": "Request Email Change",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newEmail\": \"newemail@castello.is\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/admin/change-email/request", "host": ["{{baseUrl}}"], "path": ["admin", "change-email", "request"] }
+          }
+        },
+        {
+          "name": "Verify Email Change OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"otp\": 123456\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/admin/change-email/verify-otp", "host": ["{{baseUrl}}"], "path": ["admin", "change-email", "verify-otp"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Policy Pages",
+      "item": [
+        {
+          "name": "Get All Policy Pages",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/policy", "host": ["{{baseUrl}}"], "path": ["admin", "policy"] }
+          }
+        },
+        {
+          "name": "Get Privacy Policy",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/policy/privacy-policy", "host": ["{{baseUrl}}"], "path": ["admin", "policy", "privacy-policy"] }
+          }
+        },
+        {
+          "name": "Get Terms & Conditions",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/policy/terms-conditions", "host": ["{{baseUrl}}"], "path": ["admin", "policy", "terms-conditions"] }
+          }
+        },
+        {
+          "name": "Get About App",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/policy/about-app", "host": ["{{baseUrl}}"], "path": ["admin", "policy", "about-app"] }
+          }
+        },
+        {
+          "name": "Create / Update Privacy Policy",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Privacy Policy\",\n  \"content\": \"<p>Your privacy policy content here...</p>\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/admin/policy/privacy-policy", "host": ["{{baseUrl}}"], "path": ["admin", "policy", "privacy-policy"] }
+          }
+        },
+        {
+          "name": "Create / Update Terms & Conditions",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Terms & Conditions\",\n  \"content\": \"<p>Your terms content here...</p>\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/admin/policy/terms-conditions", "host": ["{{baseUrl}}"], "path": ["admin", "policy", "terms-conditions"] }
+          }
+        },
+        {
+          "name": "Create / Update About App",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"About Castello\",\n  \"content\": \"<p>About us content here...</p>\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/admin/policy/about-app", "host": ["{{baseUrl}}"], "path": ["admin", "policy", "about-app"] }
+          }
+        },
+        {
+          "name": "Update Privacy Policy (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"<p>Updated privacy policy...</p>\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/admin/policy/privacy-policy", "host": ["{{baseUrl}}"], "path": ["admin", "policy", "privacy-policy"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Menu — Categories",
+      "item": [
+        {
+          "name": "Get All Categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/menu/categories?page=1&limit=20&searchTerm=pizza&status=active",
+              "host": ["{{baseUrl}}"],
+              "path": ["menu", "categories"],
+              "query": [
+                { "key": "page",       "value": "1" },
+                { "key": "limit",      "value": "20" },
+                { "key": "searchTerm", "value": "pizza", "disabled": true },
+                { "key": "status",     "value": "active", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Category by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/menu/categories/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["menu", "categories", ":id"],
+              "variable": [{ "key": "id", "value": "CATEGORY_ID_HERE" }]
+            }
+          }
+        },
+        {
+          "name": "Create Category",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name",  "value": "Pizza",   "type": "text" },
+                { "key": "image", "type": "file", "src": "", "description": "48×48 px — Webp/JPEG/PNG" }
+              ]
+            },
+            "url": { "raw": "{{baseUrl}}/menu/categories", "host": ["{{baseUrl}}"], "path": ["menu", "categories"] }
+          }
+        },
+        {
+          "name": "Update Category",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name",   "value": "Pizzas Updated", "type": "text" },
+                { "key": "status", "value": "active",         "type": "text" },
+                { "key": "image",  "type": "file", "src": "", "disabled": true }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/menu/categories/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["menu", "categories", ":id"],
+              "variable": [{ "key": "id", "value": "CATEGORY_ID_HERE" }]
+            }
+          }
+        },
+        {
+          "name": "Delete Category",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/menu/categories/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["menu", "categories", ":id"],
+              "variable": [{ "key": "id", "value": "CATEGORY_ID_HERE" }]
+            }
+          }
+        },
+        {
+          "name": "Toggle Category Status",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "body": { "mode": "raw", "raw": "" },
+            "url": {
+              "raw": "{{baseUrl}}/menu/categories/:id/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["menu", "categories", ":id", "status"],
+              "variable": [{ "key": "id", "value": "CATEGORY_ID_HERE" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Menu — Variants",
+      "item": [
+        {
+          "name": "Variant Categories",
+          "item": [
+            {
+              "name": "Get All Variant Categories",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/menu/variants/categories?page=1&limit=20",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["menu", "variants", "categories"],
+                  "query": [
+                    { "key": "page",       "value": "1" },
+                    { "key": "limit",      "value": "20" },
+                    { "key": "searchTerm", "value": "", "disabled": true },
+                    { "key": "status",     "value": "active", "disabled": true }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Variant Category by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/menu/variants/categories/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["menu", "variants", "categories", ":id"],
+                  "variable": [{ "key": "id", "value": "VARIANT_CATEGORY_ID_HERE" }]
+                }
+              }
+            },
+            {
+              "name": "Create Variant Category",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type",  "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Inch\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": { "raw": "{{baseUrl}}/menu/variants/categories", "host": ["{{baseUrl}}"], "path": ["menu", "variants", "categories"] }
+              }
+            },
+            {
+              "name": "Update Variant Category",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  { "key": "Content-Type",  "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Inch Updated\",\n  \"status\": \"active\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/menu/variants/categories/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["menu", "variants", "categories", ":id"],
+                  "variable": [{ "key": "id", "value": "VARIANT_CATEGORY_ID_HERE" }]
+                }
+              }
+            },
+            {
+              "name": "Delete Variant Category",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+                "url": {
+                  "raw": "{{baseUrl}}/menu/variants/categories/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["menu", "variants", "categories", ":id"],
+                  "variable": [{ "key": "id", "value": "VARIANT_CATEGORY_ID_HERE" }]
+                }
+              }
+            },
+            {
+              "name": "Toggle Variant Category Status",
+              "request": {
+                "method": "PATCH",
+                "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+                "body": { "mode": "raw", "raw": "" },
+                "url": {
+                  "raw": "{{baseUrl}}/menu/variants/categories/:id/status",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["menu", "variants", "categories", ":id", "status"],
+                  "variable": [{ "key": "id", "value": "VARIANT_CATEGORY_ID_HERE" }]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Variant Items",
+          "item": [
+            {
+              "name": "Get All Variant Items",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/menu/variants/items?page=1&limit=20",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["menu", "variants", "items"],
+                  "query": [
+                    { "key": "page",              "value": "1" },
+                    { "key": "limit",             "value": "20" },
+                    { "key": "variantCategoryId", "value": "VARIANT_CATEGORY_ID", "disabled": true },
+                    { "key": "status",            "value": "active", "disabled": true }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Variant Item by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/menu/variants/items/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["menu", "variants", "items", ":id"],
+                  "variable": [{ "key": "id", "value": "VARIANT_ITEM_ID_HERE" }]
+                }
+              }
+            },
+            {
+              "name": "Create Variant Item",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type",  "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"15\\\"\",\n  \"variantCategoryId\": \"VARIANT_CATEGORY_ID_HERE\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": { "raw": "{{baseUrl}}/menu/variants/items", "host": ["{{baseUrl}}"], "path": ["menu", "variants", "items"] }
+              }
+            },
+            {
+              "name": "Update Variant Item",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  { "key": "Content-Type",  "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"15\\\" Updated\",\n  \"status\": \"active\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/menu/variants/items/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["menu", "variants", "items", ":id"],
+                  "variable": [{ "key": "id", "value": "VARIANT_ITEM_ID_HERE" }]
+                }
+              }
+            },
+            {
+              "name": "Delete Variant Item",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+                "url": {
+                  "raw": "{{baseUrl}}/menu/variants/items/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["menu", "variants", "items", ":id"],
+                  "variable": [{ "key": "id", "value": "VARIANT_ITEM_ID_HERE" }]
+                }
+              }
+            },
+            {
+              "name": "Toggle Variant Item Status",
+              "request": {
+                "method": "PATCH",
+                "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+                "body": { "mode": "raw", "raw": "" },
+                "url": {
+                  "raw": "{{baseUrl}}/menu/variants/items/:id/status",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["menu", "variants", "items", ":id", "status"],
+                  "variable": [{ "key": "id", "value": "VARIANT_ITEM_ID_HERE" }]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Menu — Toppings",
+      "item": [
+        {
+          "name": "Topping Categories",
+          "item": [
+            {
+              "name": "Get All Topping Categories",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/menu/toppings/categories?page=1&limit=20",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["menu", "toppings", "categories"],
+                  "query": [
+                    { "key": "page",       "value": "1" },
+                    { "key": "limit",      "value": "20" },
+                    { "key": "searchTerm", "value": "", "disabled": true },
+                    { "key": "status",     "value": "active", "disabled": true }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Topping Category by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/menu/toppings/categories/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["menu", "toppings", "categories", ":id"],
+                  "variable": [{ "key": "id", "value": "TOPPING_CATEGORY_ID_HERE" }]
+                }
+              }
+            },
+            {
+              "name": "Create Topping Category",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type",  "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Meat\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": { "raw": "{{baseUrl}}/menu/toppings/categories", "host": ["{{baseUrl}}"], "path": ["menu", "toppings", "categories"] }
+              }
+            },
+            {
+              "name": "Update Topping Category",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  { "key": "Content-Type",  "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Meat & Poultry\",\n  \"status\": \"active\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/menu/toppings/categories/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["menu", "toppings", "categories", ":id"],
+                  "variable": [{ "key": "id", "value": "TOPPING_CATEGORY_ID_HERE" }]
+                }
+              }
+            },
+            {
+              "name": "Delete Topping Category",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+                "url": {
+                  "raw": "{{baseUrl}}/menu/toppings/categories/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["menu", "toppings", "categories", ":id"],
+                  "variable": [{ "key": "id", "value": "TOPPING_CATEGORY_ID_HERE" }]
+                }
+              }
+            },
+            {
+              "name": "Toggle Topping Category Status",
+              "request": {
+                "method": "PATCH",
+                "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+                "body": { "mode": "raw", "raw": "" },
+                "url": {
+                  "raw": "{{baseUrl}}/menu/toppings/categories/:id/status",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["menu", "toppings", "categories", ":id", "status"],
+                  "variable": [{ "key": "id", "value": "TOPPING_CATEGORY_ID_HERE" }]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Topping Items",
+          "item": [
+            {
+              "name": "Get All Topping Items",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/menu/toppings/items?page=1&limit=20",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["menu", "toppings", "items"],
+                  "query": [
+                    { "key": "page",              "value": "1" },
+                    { "key": "limit",             "value": "20" },
+                    { "key": "toppingCategoryId", "value": "TOPPING_CATEGORY_ID", "disabled": true },
+                    { "key": "status",            "value": "active", "disabled": true },
+                    { "key": "searchTerm",        "value": "", "disabled": true }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Topping Item by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/menu/toppings/items/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["menu", "toppings", "items", ":id"],
+                  "variable": [{ "key": "id", "value": "TOPPING_ITEM_ID_HERE" }]
+                }
+              }
+            },
+            {
+              "name": "Create Topping Item",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type",  "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Cheese\",\n  \"toppingCategoryId\": \"TOPPING_CATEGORY_ID_HERE\",\n  \"price\": 420\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": { "raw": "{{baseUrl}}/menu/toppings/items", "host": ["{{baseUrl}}"], "path": ["menu", "toppings", "items"] }
+              }
+            },
+            {
+              "name": "Update Topping Item",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  { "key": "Content-Type",  "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Cheese\",\n  \"price\": 460,\n  \"status\": \"active\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/menu/toppings/items/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["menu", "toppings", "items", ":id"],
+                  "variable": [{ "key": "id", "value": "TOPPING_ITEM_ID_HERE" }]
+                }
+              }
+            },
+            {
+              "name": "Delete Topping Item",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+                "url": {
+                  "raw": "{{baseUrl}}/menu/toppings/items/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["menu", "toppings", "items", ":id"],
+                  "variable": [{ "key": "id", "value": "TOPPING_ITEM_ID_HERE" }]
+                }
+              }
+            },
+            {
+              "name": "Toggle Topping Item Status",
+              "request": {
+                "method": "PATCH",
+                "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+                "body": { "mode": "raw", "raw": "" },
+                "url": {
+                  "raw": "{{baseUrl}}/menu/toppings/items/:id/status",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["menu", "toppings", "items", ":id", "status"],
+                  "variable": [{ "key": "id", "value": "TOPPING_ITEM_ID_HERE" }]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Menu — Products",
+      "item": [
+        {
+          "name": "Get All Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/menu/products?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["menu", "products"],
+              "query": [
+                { "key": "page",       "value": "1" },
+                { "key": "limit",      "value": "20" },
+                { "key": "searchTerm", "value": "hawaiian", "disabled": true },
+                { "key": "categoryId", "value": "CATEGORY_ID", "disabled": true },
+                { "key": "status",     "value": "active",     "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Product by ID (with variants & toppings)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/menu/products/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["menu", "products", ":id"],
+              "variable": [{ "key": "id", "value": "PRODUCT_ID_HERE" }]
+            }
+          }
+        },
+        {
+          "name": "Create Product — Single Item",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name",                  "value": "Coca-Cola",            "type": "text" },
+                { "key": "description",           "value": "Classic Coca-Cola",   "type": "text" },
+                { "key": "categoryId",            "value": "CATEGORY_ID_HERE",    "type": "text" },
+                { "key": "type",                  "value": "single",              "type": "text" },
+                { "key": "price",                 "value": "650",                 "type": "text" },
+                { "key": "toppingCategoryIds",    "value": "[]",                  "type": "text", "description": "JSON array of topping category ObjectIds" },
+                { "key": "defaultToppingItemIds", "value": "[]",                  "type": "text", "description": "JSON array of default topping ObjectIds" },
+                { "key": "availability",          "value": "{\"website\":true,\"pos\":true,\"kiosk\":true}", "type": "text" },
+                { "key": "mainImage",             "type": "file", "src": "",      "description": "220×220 px — Webp/JPEG/PNG" },
+                { "key": "gallery",               "type": "file", "src": "",      "description": "Optional gallery images (max 5)", "disabled": true }
+              ]
+            },
+            "url": { "raw": "{{baseUrl}}/menu/products", "host": ["{{baseUrl}}"], "path": ["menu", "products"] }
+          }
+        },
+        {
+          "name": "Create Product — Variant Item (Pizza)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name",                  "value": "Hawaiian",                    "type": "text" },
+                { "key": "description",           "value": "Ham, pineapple, cheese",     "type": "text" },
+                { "key": "categoryId",            "value": "PIZZA_CATEGORY_ID_HERE",     "type": "text" },
+                { "key": "type",                  "value": "variant",                    "type": "text" },
+                { "key": "toppingCategoryIds",    "value": "[\"MEAT_CAT_ID\",\"CHEESE_CAT_ID\",\"VEG_CAT_ID\",\"SPICE_CAT_ID\"]", "type": "text" },
+                { "key": "defaultToppingItemIds", "value": "[\"CHEESE_ITEM_ID\",\"HAM_ITEM_ID\"]", "type": "text" },
+                { "key": "variants",              "value": "[{\"variantCategoryId\":\"INCH_CAT_ID\",\"variantItemId\":\"15INCH_ID\",\"price\":4750,\"status\":\"active\"},{\"variantCategoryId\":\"INCH_CAT_ID\",\"variantItemId\":\"12INCH_ID\",\"price\":3750,\"status\":\"active\"},{\"variantCategoryId\":\"INCH_CAT_ID\",\"variantItemId\":\"9INCH_ID\",\"price\":2750,\"status\":\"active\"}]", "type": "text" },
+                { "key": "availability",          "value": "{\"website\":true,\"pos\":true,\"kiosk\":true}", "type": "text" },
+                { "key": "mainImage",             "type": "file", "src": "",              "description": "220×220 px — Webp/JPEG/PNG" },
+                { "key": "gallery",               "type": "file", "src": "",              "disabled": true }
+              ]
+            },
+            "url": { "raw": "{{baseUrl}}/menu/products", "host": ["{{baseUrl}}"], "path": ["menu", "products"] }
+          }
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name",         "value": "Hawaiian Updated", "type": "text" },
+                { "key": "description",  "value": "Ham, pineapple, mozzarella", "type": "text" },
+                { "key": "status",       "value": "active",           "type": "text" },
+                { "key": "availability", "value": "{\"website\":true,\"pos\":true,\"kiosk\":false}", "type": "text" },
+                { "key": "variants",     "value": "[{\"variantCategoryId\":\"INCH_CAT_ID\",\"variantItemId\":\"15INCH_ID\",\"price\":4950}]", "type": "text", "disabled": true },
+                { "key": "mainImage",    "type": "file", "src": "", "disabled": true }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/menu/products/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["menu", "products", ":id"],
+              "variable": [{ "key": "id", "value": "PRODUCT_ID_HERE" }]
+            }
+          }
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/menu/products/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["menu", "products", ":id"],
+              "variable": [{ "key": "id", "value": "PRODUCT_ID_HERE" }]
+            }
+          }
+        },
+        {
+          "name": "Toggle Product Status",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "body": { "mode": "raw", "raw": "" },
+            "url": {
+              "raw": "{{baseUrl}}/menu/products/:id/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["menu", "products", ":id", "status"],
+              "variable": [{ "key": "id", "value": "PRODUCT_ID_HERE" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Promotions — Offers",
+      "item": [
+        {
+          "name": "Get All Offers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/promotions/offers?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["promotions", "offers"],
+              "query": [
+                { "key": "page",       "value": "1" },
+                { "key": "limit",      "value": "20" },
+                { "key": "searchTerm", "value": "", "disabled": true },
+                { "key": "status",     "value": "active", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Offer by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/promotions/offers/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["promotions", "offers", ":id"],
+              "variable": [{ "key": "id", "value": "OFFER_ID_HERE" }]
+            }
+          }
+        },
+        {
+          "name": "Create Offer",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title",        "value": "12\" Home Delivery Offer",          "type": "text" },
+                { "key": "description",  "value": "12\" pizza, 2L soda & breadsticks", "type": "text" },
+                { "key": "price",        "value": "5960",                              "type": "text" },
+                {
+                  "key":   "offerItems",
+                  "value": "[{\"categoryId\":\"PIZZA_CAT_ID\",\"isFixed\":false,\"products\":[{\"productId\":\"HAWAIIAN_ID\",\"variantItemIds\":[\"12INCH_ID\"]},{\"productId\":\"MARGARITA_ID\",\"variantItemIds\":[\"12INCH_ID\"]}]},{\"categoryId\":\"DRINKS_CAT_ID\",\"isFixed\":false,\"products\":[{\"productId\":\"COKE_ID\",\"variantItemIds\":[\"2L_ID\"]}]},{\"categoryId\":\"CHAMPIONSHIP_CAT_ID\",\"isFixed\":true,\"products\":[{\"productId\":\"BREADSTICKS_LARGE_ID\",\"variantItemIds\":[]}]}]",
+                  "type":  "text",
+                  "description": "JSON array of offer item slots"
+                },
+                { "key": "availability",  "value": "{\"website\":true,\"pos\":true,\"kiosk\":false}",     "type": "text" },
+                { "key": "availableFor",  "value": "{\"homeDelivery\":true,\"takeaway\":false}",           "type": "text" },
+                { "key": "mainImage",     "type": "file", "src": "", "description": "1320×520 px — Webp/JPEG/PNG" },
+                { "key": "gallery",       "type": "file", "src": "", "disabled": true }
+              ]
+            },
+            "url": { "raw": "{{baseUrl}}/promotions/offers", "host": ["{{baseUrl}}"], "path": ["promotions", "offers"] }
+          }
+        },
+        {
+          "name": "Update Offer",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title",       "value": "12\" Offer Updated", "type": "text" },
+                { "key": "price",       "value": "6200",               "type": "text" },
+                { "key": "status",      "value": "active",             "type": "text" },
+                { "key": "mainImage",   "type": "file", "src": "",     "disabled": true }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/promotions/offers/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["promotions", "offers", ":id"],
+              "variable": [{ "key": "id", "value": "OFFER_ID_HERE" }]
+            }
+          }
+        },
+        {
+          "name": "Delete Offer",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/promotions/offers/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["promotions", "offers", ":id"],
+              "variable": [{ "key": "id", "value": "OFFER_ID_HERE" }]
+            }
+          }
+        },
+        {
+          "name": "Toggle Offer Status",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "body": { "mode": "raw", "raw": "" },
+            "url": {
+              "raw": "{{baseUrl}}/promotions/offers/:id/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["promotions", "offers", ":id", "status"],
+              "variable": [{ "key": "id", "value": "OFFER_ID_HERE" }]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

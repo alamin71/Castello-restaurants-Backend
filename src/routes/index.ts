@@ -4,6 +4,7 @@ import { AuthRouter } from '../app/modules/auth/auth.route';
 import { AdminRoutes } from '../app/modules/admin/admin.route';
 
 const router = express.Router();
+
 const routes = [
   {
     path: '/auth',

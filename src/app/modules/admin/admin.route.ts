@@ -7,6 +7,12 @@ import { PolicyPageValidation } from './policy-page.validation';
 import auth from '../../middleware/auth';
 import validateRequest from '../../middleware/validateRequest';
 import { s3FileUploadHandler } from '../../middleware/s3FileUploadHandler';
+import { CategoryRouter } from '../menu/category/category.route';
+import { VariantRouter } from '../menu/variant/variant.route';
+import { ToppingRouter } from '../menu/topping/topping.route';
+import { ProductRouter } from '../menu/product/product.route';
+import { OfferRouter } from '../promotion/offer/offer.route';
+
 const router = express.Router();
 const adminUpload = s3FileUploadHandler;
 
@@ -73,14 +79,14 @@ router.patch(
 );
 
 router.delete(
-  '/:id',
-  auth(USER_ROLES.SUPER_ADMIN),
-  AdminController.deleteAdmin
-);
-router.delete(
   '/profile/photo',
   auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
   AdminController.removeProfilePhoto
+);
+router.delete(
+  '/:id',
+  auth(USER_ROLES.SUPER_ADMIN),
+  AdminController.deleteAdmin
 );
 // Email Change Endpoints
 router.post(
@@ -131,5 +137,14 @@ router.delete(
   auth(USER_ROLES.SUPER_ADMIN),
   AdminController.deleteAdmin
 );
+
+// ============================================
+// ADMIN DASHBOARD MODULE ROUTES
+// ============================================
+router.use('/menu/categories', CategoryRouter);
+router.use('/menu/variants', VariantRouter);
+router.use('/menu/toppings', ToppingRouter);
+router.use('/menu/products', ProductRouter);
+router.use('/promotions/offers', OfferRouter);
 
 export const AdminRoutes = router;
