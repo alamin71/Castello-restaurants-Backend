@@ -2,22 +2,24 @@ import express from 'express';
 import { UserRouter } from '../app/modules/user/user.route';
 import { AuthRouter } from '../app/modules/auth/auth.route';
 import { AdminRoutes } from '../app/modules/admin/admin.route';
+import { CategoryRouter } from '../app/modules/menu/category/category.route';
+import { VariantRouter } from '../app/modules/menu/variant/variant.route';
+import { ToppingRouter } from '../app/modules/menu/topping/topping.route';
+import { ProductRouter } from '../app/modules/menu/product/product.route';
+import { OfferRouter } from '../app/modules/promotion/offer/offer.route';
 
 const router = express.Router();
 
 const routes = [
-  {
-    path: '/auth',
-    route: AuthRouter,
-  },
-  {
-    path: '/users',
-    route: UserRouter,
-  },
-  {
-    path: '/admin',
-    route: AdminRoutes,
-  },
+  { path: '/auth',                       route: AuthRouter },
+  { path: '/users',                      route: UserRouter },
+  // ── Admin ──────────────────────────────────────────────
+  { path: '/admin',                      route: AdminRoutes },
+  { path: '/admin/menu/categories',      route: CategoryRouter },
+  { path: '/admin/menu/variants',        route: VariantRouter },
+  { path: '/admin/menu/toppings',        route: ToppingRouter },
+  { path: '/admin/menu/products',        route: ProductRouter },
+  { path: '/admin/promotions/offers',    route: OfferRouter },
 ];
 
 routes.forEach((element) => {
