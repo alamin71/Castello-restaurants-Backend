@@ -64,4 +64,19 @@ router.post(
   AuthController.resendOtp
 );
 
+// Phone OTP login routes
+router.post(
+  '/phone/send-otp',
+  validateRequest(AuthValidation.sendPhoneOtpZodSchema),
+  AuthController.sendPhoneOtp
+);
+
+router.post(
+  '/phone/verify-otp',
+  validateRequest(AuthValidation.verifyPhoneOtpZodSchema),
+  AuthController.verifyPhoneOtp
+);
+
+router.post('/phone/resend-otp', AuthController.resendPhoneOtp);
+
 export const AuthRouter = router;

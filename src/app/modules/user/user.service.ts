@@ -11,7 +11,7 @@ import generateOTP from '../../../utils/generateOTP';
 // create user
 const createUserToDB = async (payload: IUser): Promise<IUser> => {
   //set role
-  const user = await User.isExistUserByEmail(payload.email);
+  const user = await User.isExistUserByEmail(payload.email!);
   if (user) {
     throw new AppError(StatusCodes.CONFLICT, 'Email already exists');
   }
@@ -122,7 +122,7 @@ const verifyUserPassword = async (userId: string, password: string) => {
   if (!user) {
     throw new AppError(StatusCodes.NOT_FOUND, 'User not found.');
   }
-  const isPasswordValid = await User.isMatchPassword(password, user.password);
+  const isPasswordValid = await User.isMatchPassword(password, user.password!);
   return isPasswordValid;
 };
 const deleteUser = async (id: string) => {

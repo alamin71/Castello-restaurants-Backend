@@ -206,6 +206,85 @@ const refreshToken = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
+// resend phone OTP
+const resendPhoneOtp = catchAsync(async (req, res) => {
+  const phoneToken =
+    (req.headers['phone-token'] as string) ||
+    (req.headers.authorization as string)?.split(' ')[1];
+
+  if (!phoneToken) {
+    throw new AppError(StatusCodes.UNAUTHORIZED, 'Phone token is required');
+  }
+
+  let decoded;
+  try {
+    decoded = jwtHelper.verifyToken(phoneToken, config.jwt.jwt_secret as Secret);
+  } catch {
+    throw new AppError(StatusCodes.UNAUTHORIZED, 'Invalid or expired phone token');
+  }
+
+  const phone = decoded?.phone as string;
+  if (!phone) {
+    throw new AppError(StatusCodes.UNAUTHORIZED, 'Invalid phone token payload');
+  }
+
+  const result = await AuthService.resendPhoneOtpToDB(phone);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'OTP resent to your phone number.',
+    data: result,
+  });
+});
+
+// send phone OTP
+const sendPhoneOtp = catchAsync(async (req, res) => {
+  const { phone } = req.body;
+  const result = await AuthService.sendPhoneOtpToDB(phone);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'OTP sent to your phone number.',
+    data: result,
+  });
+});
+
+// verify phone OTP
+const verifyPhoneOtp = catchAsync(async (req, res) => {
+  const phoneToken =
+    (req.headers['phone-token'] as string) ||
+    (req.headers.authorization as string)?.split(' ')[1];
+
+  if (!phoneToken) {
+    throw new AppError(StatusCodes.UNAUTHORIZED, 'Phone token is required');
+  }
+
+  let decoded;
+  try {
+    decoded = jwtHelper.verifyToken(phoneToken, config.jwt.jwt_secret as Secret);
+  } catch {
+    throw new AppError(StatusCodes.UNAUTHORIZED, 'Invalid or expired phone token');
+  }
+
+  const phone = decoded?.phone as string;
+  if (!phone) {
+    throw new AppError(StatusCodes.UNAUTHORIZED, 'Invalid phone token payload');
+  }
+
+  const { otp } = req.body;
+  const result = await AuthService.verifyPhoneOtpToDB(phone, Number(otp));
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Phone verified successfully.',
+    data: result,
+  });
+});
+
 export const AuthController = {
   signupUser,
   loginUser,
@@ -213,8 +292,9 @@ export const AuthController = {
   resetPassword,
   changePassword,
   verifyOtp,
-  // forgetPasswordByUrl,  // URL-based (commented for future use)
-  // resetPasswordByUrl,   // URL-based (commented for future use)
   resendOtp,
   refreshToken,
+  sendPhoneOtp,
+  verifyPhoneOtp,
+  resendPhoneOtp,
 };

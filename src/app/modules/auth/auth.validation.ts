@@ -61,6 +61,21 @@ const createVerifyOtpZodSchema = z.object({
   body: otpBodySchema,
 });
 
+const sendPhoneOtpZodSchema = z.object({
+  body: z.object({
+    phone: z.string().nonempty({ message: 'Phone number is required' }),
+  }),
+});
+
+const verifyPhoneOtpZodSchema = z.object({
+  body: z.object({
+    otp: z.preprocess(
+      (val) => Number(val),
+      z.number().int().nonnegative({ message: 'OTP is required' })
+    ),
+  }),
+});
+
 export const AuthValidation = {
   createSignupZodSchema,
   createForgetPasswordZodSchema,
@@ -69,4 +84,6 @@ export const AuthValidation = {
   createResetPasswordZodSchema,
   createChangePasswordZodSchema,
   createVerifyOtpZodSchema,
+  sendPhoneOtpZodSchema,
+  verifyPhoneOtpZodSchema,
 };

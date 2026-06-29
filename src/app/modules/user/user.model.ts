@@ -11,6 +11,7 @@ const userSchema = new Schema<IUser, UserModel>(
     name: {
       type: String,
       required: true,
+      default: 'User',
     },
     role: {
       type: String,
@@ -19,15 +20,23 @@ const userSchema = new Schema<IUser, UserModel>(
     },
     email: {
       type: String,
-      required: true,
       unique: true,
+      sparse: true,
       lowercase: true,
     },
     password: {
       type: String,
-      required: true,
       select: false,
       minlength: 8,
+    },
+    phone: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+    phoneVerified: {
+      type: Boolean,
+      default: false,
     },
     image: {
       type: String,
@@ -64,6 +73,14 @@ const userSchema = new Schema<IUser, UserModel>(
           type: Date,
           default: null,
         },
+        phoneOtp: {
+          type: Number,
+          default: null,
+        },
+        phoneOtpExpireAt: {
+          type: Date,
+          default: null,
+        },
       },
       select: false,
     },
@@ -76,11 +93,14 @@ userSchema.statics.isExistUserById = async (id: string) => {
   return await User.findById(id);
 };
 
-// db.users.updateOne({email:"tihow91361@linxues.com"},{email:"rakibhassan305@gmail.com"})
-
 userSchema.statics.isExistUserByEmail = async (email: string) => {
   return await User.findOne({ email });
 };
+
+userSchema.statics.isExistUserByPhone = async (phone: string) => {
+  return await User.findOne({ phone });
+};
+
 // Password Matching
 userSchema.statics.isMatchPassword = async (
   password: string,
@@ -89,17 +109,14 @@ userSchema.statics.isMatchPassword = async (
   return await bcrypt.compare(password, hashPassword);
 };
 
-// Pre-Save Hook for Hashing Password & Checking Email Uniqueness
+// Pre-Save Hook for Hashing Password
 userSchema.pre('save', async function (next) {
-  const isExist = await User.findOne({ email: this.get('email') });
-  if (isExist) {
-    throw new AppError(StatusCodes.BAD_REQUEST, 'Email already exists!');
+  if (this.isModified('password') && this.password) {
+    this.password = await bcrypt.hash(
+      this.password,
+      Number(config.bcrypt_salt_rounds)
+    );
   }
-
-  this.password = await bcrypt.hash(
-    this.password,
-    Number(config.bcrypt_salt_rounds)
-  );
   next();
 });
 

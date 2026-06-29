@@ -4,6 +4,7 @@ import { JwtPayload, Secret } from 'jsonwebtoken';
 import config from '../../../config';
 import { emailHelper } from '../../../helpers/emailHelper';
 import { jwtHelper } from '../../../helpers/jwtHelper';
+import { twilioHelper } from '../../../helpers/twilioHelper';
 import { emailTemplate } from '../../../shared/emailTemplate';
 import {
   IAuthResetPassword,
@@ -33,7 +34,7 @@ const loginUserFromDB = async (payload: ILoginData) => {
   if (!isExistUser.verified) {
     //send mail
     const otp = generateOTP(6);
-    const value = { otp, email: isExistUser.email };
+    const value = { otp, email: isExistUser.email! };
     const forgetPassword = emailTemplate.resetPassword(value);
     emailHelper.sendEmail(forgetPassword);
 
@@ -59,7 +60,7 @@ const loginUserFromDB = async (payload: ILoginData) => {
   }
 
   //check match password
-  if (!(await User.isMatchPassword(password, isExistUser.password))) {
+  if (!(await User.isMatchPassword(password, isExistUser.password!))) {
     throw new AppError(StatusCodes.BAD_REQUEST, 'Password is incorrect!');
   }
 
@@ -163,7 +164,7 @@ const forgetPasswordToDB = async (email: string) => {
 
   //send mail
   const otp = generateOTP(4);
-  const value = { otp, email: isExistUser.email };
+  const value = { otp, email: isExistUser.email! };
   const forgetPassword = emailTemplate.resetPassword(value);
   emailHelper.sendEmail(forgetPassword);
 
@@ -255,8 +256,8 @@ const forgetPasswordByUrlToDB = async (email: string) => {
 
   // Generate JWT token for password reset valid for 10 minutes
   const jwtPayload = {
-    id: isExistUser.email,
-    email: isExistUser.email,
+    id: isExistUser.email!,
+    email: isExistUser.email!,
     role: isExistUser.role,
   };
   const resetToken = createToken(
@@ -266,11 +267,11 @@ const forgetPasswordByUrlToDB = async (email: string) => {
   );
 
   // Construct password reset URL
-  const resetUrl = `${config.frontend_url}/auth/login/set_password?email=${isExistUser.email}&token=${resetToken}`;
+  const resetUrl = `${config.frontend_url}/auth/login/set_password?email=${isExistUser.email!}&token=${resetToken}`;
 
   // Prepare email template
   const forgetPasswordEmail = emailTemplate.resetPasswordByUrl({
-    email: isExistUser.email,
+    email: isExistUser.email!,
     resetUrl,
   });
 
@@ -477,7 +478,7 @@ const changePasswordToDB = async (
   //current password match
   if (
     currentPassword &&
-    !(await User.isMatchPassword(currentPassword, isExistUser.password))
+    !(await User.isMatchPassword(currentPassword, isExistUser.password!))
   ) {
     throw new AppError(StatusCodes.BAD_REQUEST, 'Password is incorrect');
   }
@@ -551,6 +552,123 @@ const refreshToken = async (token: string) => {
 
   return { accessToken };
 };
+// Resend phone OTP
+const resendPhoneOtpToDB = async (phone: string) => {
+  const user = await User.findOne({ phone });
+  if (!user) {
+    throw new AppError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+  }
+
+  if (user.status === 'blocked') {
+    throw new AppError(
+      StatusCodes.FORBIDDEN,
+      'Your account has been blocked. Please contact support.'
+    );
+  }
+
+  const otp = generateOTP(6);
+  const authentication = {
+    phoneOtp: Number(otp),
+    phoneOtpExpireAt: new Date(Date.now() + 5 * 60000),
+  };
+  await User.findOneAndUpdate({ phone }, { $set: { authentication } });
+
+  await twilioHelper.sendSms(phone, `Your Castello verification code is: ${otp}`);
+
+  const phoneToken = jwtHelper.createToken(
+    { phone },
+    config.jwt.jwt_secret as Secret,
+    '10m'
+  );
+
+  return { phoneToken };
+};
+
+// Send OTP to phone number (creates user if not exists)
+const sendPhoneOtpToDB = async (phone: string) => {
+  let user = await User.findOne({ phone }).select('+authentication');
+
+  if (!user) {
+    user = await User.create({ phone, name: 'User', verified: true });
+    user = await User.findOne({ phone }).select('+authentication');
+  }
+
+  if (user!.status === 'blocked') {
+    throw new AppError(
+      StatusCodes.FORBIDDEN,
+      'Your account has been blocked. Please contact support.'
+    );
+  }
+
+  const otp = generateOTP(6);
+  const authentication = {
+    phoneOtp: Number(otp),
+    phoneOtpExpireAt: new Date(Date.now() + 5 * 60000),
+  };
+  await User.findOneAndUpdate({ phone }, { $set: { authentication } });
+
+  await twilioHelper.sendSms(phone, `Your Castello verification code is: ${otp}`);
+
+  const phoneToken = jwtHelper.createToken(
+    { phone },
+    config.jwt.jwt_secret as Secret,
+    '10m'
+  );
+
+  return { phoneToken };
+};
+
+// Verify phone OTP and return JWT tokens
+const verifyPhoneOtpToDB = async (phone: string, otp: number) => {
+  const user = await User.findOne({ phone }).select('+authentication');
+  if (!user) {
+    throw new AppError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+  }
+
+  if (!otp) {
+    throw new AppError(StatusCodes.BAD_REQUEST, 'OTP is required');
+  }
+
+  const dbOtp = String(user.authentication?.phoneOtp);
+  if (dbOtp !== String(otp)) {
+    throw new AppError(StatusCodes.BAD_REQUEST, 'Incorrect OTP');
+  }
+
+  const expireAt = user.authentication?.phoneOtpExpireAt;
+  if (!expireAt || new Date() > expireAt) {
+    throw new AppError(StatusCodes.BAD_REQUEST, 'OTP expired. Please request a new one.');
+  }
+
+  await User.findOneAndUpdate(
+    { phone },
+    {
+      phoneVerified: true,
+      'authentication.phoneOtp': null,
+      'authentication.phoneOtpExpireAt': null,
+    }
+  );
+
+  const jwtData = {
+    id: String(user._id),
+    role: user.role,
+    phone: user.phone,
+    name: user.name,
+  };
+
+  const accessToken = jwtHelper.createToken(
+    jwtData,
+    config.jwt.jwt_secret as Secret,
+    config.jwt.jwt_expire_in as string
+  );
+  const refreshToken = jwtHelper.createToken(
+    jwtData,
+    config.jwt.jwt_refresh_secret as string,
+    config.jwt.jwt_refresh_expire_in as string
+  );
+
+  return { accessToken, refreshToken };
+};
+
 export const AuthService = {
   verifyEmailToDB,
   loginUserFromDB,
@@ -562,4 +680,7 @@ export const AuthService = {
   resetPasswordByUrl,
   resendOtpFromDb,
   refreshToken,
+  sendPhoneOtpToDB,
+  verifyPhoneOtpToDB,
+  resendPhoneOtpToDB,
 };
