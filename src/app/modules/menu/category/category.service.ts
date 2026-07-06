@@ -80,7 +80,6 @@ const updateCategoryInDB = async (id: string, payload: Partial<ICategory>) => {
 
   const category = await Category.findByIdAndUpdate(id, payload, {
     new: true,
-    runValidators: true,
   });
   if (!category) {
     throw new AppError(StatusCodes.NOT_FOUND, 'Category not found');
