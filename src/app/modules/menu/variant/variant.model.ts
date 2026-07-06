@@ -20,6 +20,7 @@ const variantCategorySchema = new Schema<IVariantCategory>(
   {
     variantCategoryId: { type: String, required: true, unique: true },
     name:              { type: String, required: true, unique: true, trim: true },
+    image:             { type: String, default: '' },
     status:            { type: String, enum: ['active', 'inactive'], default: 'active' },
     isDeleted:         { type: Boolean, default: false },
   },

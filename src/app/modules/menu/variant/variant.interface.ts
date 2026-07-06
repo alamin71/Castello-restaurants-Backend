@@ -5,6 +5,7 @@ export type TStatus = 'active' | 'inactive';
 export interface IVariantCategory {
   variantCategoryId: string;
   name: string;
+  image: string;
   status: TStatus;
   isDeleted: boolean;
 }

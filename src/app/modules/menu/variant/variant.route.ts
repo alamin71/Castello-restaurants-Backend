@@ -2,6 +2,7 @@ import express from 'express';
 import { USER_ROLES } from '../../../../enums/user';
 import auth from '../../../middleware/auth';
 import validateRequest from '../../../middleware/validateRequest';
+import { s3FileUploadHandler } from '../../../middleware/s3FileUploadHandler';
 import { VariantController } from './variant.controller';
 import { VariantValidation } from './variant.validation';
 
@@ -14,6 +15,7 @@ router.get('/categories/:id', VariantController.getVariantCategoryById);
 router.post(
   '/categories',
   auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  s3FileUploadHandler.fields([{ name: 'image', maxCount: 1 }]),
   validateRequest(VariantValidation.createVariantCategorySchema),
   VariantController.createVariantCategory
 );
@@ -21,6 +23,7 @@ router.post(
 router.patch(
   '/categories/:id',
   auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  s3FileUploadHandler.fields([{ name: 'image', maxCount: 1 }]),
   validateRequest(VariantValidation.updateVariantCategorySchema),
   VariantController.updateVariantCategory
 );

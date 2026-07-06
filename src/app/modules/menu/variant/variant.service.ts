@@ -11,6 +11,17 @@ import { VariantCategory, VariantItem } from './variant.model';
 // ─── Variant Categories ────────────────────────────────────────────────────
 
 const createVariantCategoryToDB = async (payload: Partial<IVariantCategory>) => {
+  const existing = await VariantCategory.findOne({
+    name: payload.name,
+    isDeleted: { $ne: true },
+  });
+  if (existing) {
+    throw new AppError(
+      StatusCodes.CONFLICT,
+      `Variant category name '${payload.name}' already exists`
+    );
+  }
+
   payload.variantCategoryId = generateVariantCategoryId();
   const category = await VariantCategory.create(payload);
   if (!category) {
@@ -52,21 +63,33 @@ const getVariantCategoryByIdFromDB = async (id: string) => {
 };
 
 const updateVariantCategoryInDB = async (id: string, payload: Partial<IVariantCategory>) => {
-  const category = await VariantCategory.findByIdAndUpdate(id, payload, {
-    new: true,
-    runValidators: true,
-  });
+  if (payload.name) {
+    const duplicate = await VariantCategory.findOne({
+      name: payload.name,
+      _id: { $ne: id },
+      isDeleted: { $ne: true },
+    });
+    if (duplicate) {
+      throw new AppError(
+        StatusCodes.CONFLICT,
+        `Variant category name '${payload.name}' already exists`
+      );
+    }
+  }
+
+  const category = await VariantCategory.findByIdAndUpdate(id, payload, { new: true });
   if (!category) throw new AppError(StatusCodes.NOT_FOUND, 'Variant category not found');
   return category;
 };
 
 const deleteVariantCategoryFromDB = async (id: string) => {
-  const category = await VariantCategory.findByIdAndUpdate(
-    id,
-    { isDeleted: true },
-    { new: true }
-  );
-  if (!category) throw new AppError(StatusCodes.NOT_FOUND, 'Variant category not found');
+  const existing = await VariantCategory.findById(id);
+  if (!existing) throw new AppError(StatusCodes.NOT_FOUND, 'Variant category not found');
+
+  await VariantCategory.findByIdAndUpdate(id, {
+    isDeleted: true,
+    name: `${existing.name}_deleted_${Date.now()}`,
+  });
   return null;
 };
 

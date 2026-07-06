@@ -2,12 +2,18 @@ import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import catchAsync from '../../../../shared/catchAsync';
 import sendResponse from '../../../../shared/sendResponse';
+import { uploadToS3 } from '../../../../helpers/s3Helper';
 import { VariantService } from './variant.service';
 
 // ─── Variant Categories ────────────────────────────────────────────────────
 
 const createVariantCategory = catchAsync(async (req: Request, res: Response) => {
-  const result = await VariantService.createVariantCategoryToDB(req.body);
+  const payload = { ...req.body };
+  const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
+  if (files?.image?.[0]) {
+    payload.image = await uploadToS3(files.image[0], 'variant-categories');
+  }
+  const result = await VariantService.createVariantCategoryToDB(payload);
   sendResponse(res, {
     statusCode: StatusCodes.CREATED,
     success: true,
@@ -40,7 +46,12 @@ const getVariantCategoryById = catchAsync(async (req: Request, res: Response) =>
 });
 
 const updateVariantCategory = catchAsync(async (req: Request, res: Response) => {
-  const result = await VariantService.updateVariantCategoryInDB(req.params.id as string, req.body);
+  const payload = { ...req.body };
+  const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
+  if (files?.image?.[0]) {
+    payload.image = await uploadToS3(files.image[0], 'variant-categories');
+  }
+  const result = await VariantService.updateVariantCategoryInDB(req.params.id as string, payload);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
