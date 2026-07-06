@@ -47,6 +47,7 @@ router.get('/items/:id', VariantController.getVariantItemById);
 router.post(
   '/items',
   auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  s3FileUploadHandler.none(),
   validateRequest(VariantValidation.createVariantItemSchema),
   VariantController.createVariantItem
 );
@@ -54,6 +55,7 @@ router.post(
 router.patch(
   '/items/:id',
   auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  s3FileUploadHandler.none(),
   validateRequest(VariantValidation.updateVariantItemSchema),
   VariantController.updateVariantItem
 );

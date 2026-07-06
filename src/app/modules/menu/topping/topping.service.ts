@@ -11,6 +11,14 @@ import { ToppingCategory, ToppingItem } from './topping.model';
 // ─── Topping Categories ────────────────────────────────────────────────────
 
 const createToppingCategoryToDB = async (payload: Partial<IToppingCategory>) => {
+  const existing = await ToppingCategory.findOne({
+    name: payload.name,
+    isDeleted: { $ne: true },
+  });
+  if (existing) {
+    throw new AppError(StatusCodes.CONFLICT, `Topping category name '${payload.name}' already exists`);
+  }
+
   payload.toppingCategoryId = generateToppingCategoryId();
   const category = await ToppingCategory.create(payload);
   if (!category) throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to create topping category');
@@ -50,21 +58,30 @@ const getToppingCategoryByIdFromDB = async (id: string) => {
 };
 
 const updateToppingCategoryInDB = async (id: string, payload: Partial<IToppingCategory>) => {
-  const category = await ToppingCategory.findByIdAndUpdate(id, payload, {
-    new: true,
-    runValidators: true,
-  });
+  if (payload.name) {
+    const duplicate = await ToppingCategory.findOne({
+      name: payload.name,
+      _id: { $ne: id },
+      isDeleted: { $ne: true },
+    });
+    if (duplicate) {
+      throw new AppError(StatusCodes.CONFLICT, `Topping category name '${payload.name}' already exists`);
+    }
+  }
+
+  const category = await ToppingCategory.findByIdAndUpdate(id, payload, { new: true });
   if (!category) throw new AppError(StatusCodes.NOT_FOUND, 'Topping category not found');
   return category;
 };
 
 const deleteToppingCategoryFromDB = async (id: string) => {
-  const category = await ToppingCategory.findByIdAndUpdate(
-    id,
-    { isDeleted: true },
-    { new: true }
-  );
-  if (!category) throw new AppError(StatusCodes.NOT_FOUND, 'Topping category not found');
+  const existing = await ToppingCategory.findById(id);
+  if (!existing) throw new AppError(StatusCodes.NOT_FOUND, 'Topping category not found');
+
+  await ToppingCategory.findByIdAndUpdate(id, {
+    isDeleted: true,
+    name: `${existing.name}_deleted_${Date.now()}`,
+  });
   return null;
 };
 
@@ -78,6 +95,15 @@ const toggleToppingCategoryStatusInDB = async (id: string) => {
 // ─── Topping Items ─────────────────────────────────────────────────────────
 
 const createToppingItemToDB = async (payload: Partial<IToppingItem>) => {
+  const existing = await ToppingItem.findOne({
+    name: payload.name,
+    toppingCategoryId: payload.toppingCategoryId,
+    isDeleted: { $ne: true },
+  });
+  if (existing) {
+    throw new AppError(StatusCodes.CONFLICT, `Topping item name '${payload.name}' already exists in this category`);
+  }
+
   payload.toppingItemId = generateToppingItemId();
   const item = await ToppingItem.create(payload);
   if (!item) throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to create topping item');
@@ -108,21 +134,32 @@ const getToppingItemByIdFromDB = async (id: string) => {
 };
 
 const updateToppingItemInDB = async (id: string, payload: Partial<IToppingItem>) => {
-  const item = await ToppingItem.findByIdAndUpdate(id, payload, {
-    new: true,
-    runValidators: true,
-  });
+  if (payload.name) {
+    const existing = await ToppingItem.findById(id);
+    const duplicate = await ToppingItem.findOne({
+      name: payload.name,
+      toppingCategoryId: payload.toppingCategoryId ?? existing?.toppingCategoryId,
+      _id: { $ne: id },
+      isDeleted: { $ne: true },
+    });
+    if (duplicate) {
+      throw new AppError(StatusCodes.CONFLICT, `Topping item name '${payload.name}' already exists in this category`);
+    }
+  }
+
+  const item = await ToppingItem.findByIdAndUpdate(id, payload, { new: true });
   if (!item) throw new AppError(StatusCodes.NOT_FOUND, 'Topping item not found');
   return item;
 };
 
 const deleteToppingItemFromDB = async (id: string) => {
-  const item = await ToppingItem.findByIdAndUpdate(
-    id,
-    { isDeleted: true },
-    { new: true }
-  );
-  if (!item) throw new AppError(StatusCodes.NOT_FOUND, 'Topping item not found');
+  const existing = await ToppingItem.findById(id);
+  if (!existing) throw new AppError(StatusCodes.NOT_FOUND, 'Topping item not found');
+
+  await ToppingItem.findByIdAndUpdate(id, {
+    isDeleted: true,
+    name: `${existing.name}_deleted_${Date.now()}`,
+  });
   return null;
 };
 

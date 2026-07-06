@@ -103,6 +103,18 @@ const toggleVariantCategoryStatusInDB = async (id: string) => {
 // ─── Variant Items ─────────────────────────────────────────────────────────
 
 const createVariantItemToDB = async (payload: Partial<IVariantItem>) => {
+  const existing = await VariantItem.findOne({
+    name: payload.name,
+    variantCategoryId: payload.variantCategoryId,
+    isDeleted: { $ne: true },
+  });
+  if (existing) {
+    throw new AppError(
+      StatusCodes.CONFLICT,
+      `Variant item name '${payload.name}' already exists in this category`
+    );
+  }
+
   payload.variantItemId = generateVariantItemId();
   const item = await VariantItem.create(payload);
   if (!item) throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to create variant item');
@@ -133,21 +145,35 @@ const getVariantItemByIdFromDB = async (id: string) => {
 };
 
 const updateVariantItemInDB = async (id: string, payload: Partial<IVariantItem>) => {
-  const item = await VariantItem.findByIdAndUpdate(id, payload, {
-    new: true,
-    runValidators: true,
-  });
+  if (payload.name) {
+    const existing = await VariantItem.findById(id);
+    const duplicate = await VariantItem.findOne({
+      name: payload.name,
+      variantCategoryId: payload.variantCategoryId ?? existing?.variantCategoryId,
+      _id: { $ne: id },
+      isDeleted: { $ne: true },
+    });
+    if (duplicate) {
+      throw new AppError(
+        StatusCodes.CONFLICT,
+        `Variant item name '${payload.name}' already exists in this category`
+      );
+    }
+  }
+
+  const item = await VariantItem.findByIdAndUpdate(id, payload, { new: true });
   if (!item) throw new AppError(StatusCodes.NOT_FOUND, 'Variant item not found');
   return item;
 };
 
 const deleteVariantItemFromDB = async (id: string) => {
-  const item = await VariantItem.findByIdAndUpdate(
-    id,
-    { isDeleted: true },
-    { new: true }
-  );
-  if (!item) throw new AppError(StatusCodes.NOT_FOUND, 'Variant item not found');
+  const existing = await VariantItem.findById(id);
+  if (!existing) throw new AppError(StatusCodes.NOT_FOUND, 'Variant item not found');
+
+  await VariantItem.findByIdAndUpdate(id, {
+    isDeleted: true,
+    name: `${existing.name}_deleted_${Date.now()}`,
+  });
   return null;
 };
 
