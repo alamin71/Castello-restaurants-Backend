@@ -7,6 +7,17 @@ import { Category } from './category.model';
 import { Product } from '../product/product.model';
 
 const createCategoryToDB = async (payload: Partial<ICategory>) => {
+  const existing = await Category.findOne({
+    name: payload.name,
+    isDeleted: { $ne: true },
+  });
+  if (existing) {
+    throw new AppError(
+      StatusCodes.CONFLICT,
+      `Category name '${payload.name}' already exists`
+    );
+  }
+
   payload.categoryId = generateCategoryId();
   const category = await Category.create(payload);
   if (!category) {
@@ -52,6 +63,21 @@ const getCategoryByIdFromDB = async (id: string) => {
 };
 
 const updateCategoryInDB = async (id: string, payload: Partial<ICategory>) => {
+  // Check if another active category already has the same name
+  if (payload.name) {
+    const duplicate = await Category.findOne({
+      name: payload.name,
+      _id: { $ne: id },
+      isDeleted: { $ne: true },
+    });
+    if (duplicate) {
+      throw new AppError(
+        StatusCodes.CONFLICT,
+        `Category name '${payload.name}' already exists`
+      );
+    }
+  }
+
   const category = await Category.findByIdAndUpdate(id, payload, {
     new: true,
     runValidators: true,
@@ -63,14 +89,17 @@ const updateCategoryInDB = async (id: string, payload: Partial<ICategory>) => {
 };
 
 const deleteCategoryFromDB = async (id: string) => {
-  const category = await Category.findByIdAndUpdate(
-    id,
-    { isDeleted: true },
-    { new: true }
-  );
-  if (!category) {
+  const existing = await Category.findById(id);
+  if (!existing) {
     throw new AppError(StatusCodes.NOT_FOUND, 'Category not found');
   }
+
+  // Free up the name so it can be reused after deletion
+  await Category.findByIdAndUpdate(id, {
+    isDeleted: true,
+    name: `${existing.name}_deleted_${Date.now()}`,
+  });
+
   return null;
 };
 
