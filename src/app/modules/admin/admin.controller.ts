@@ -179,8 +179,15 @@ const adminResetPassword = catchAsync(async (req: Request, res: Response) => {
 });
 
 const adminResendOtp = catchAsync(async (req: Request, res: Response) => {
-  const { email } = req.body;
-  const result = await AdminService.adminResendOtpToDB(email);
+  const resendToken =
+    (req.headers['resend-token'] as string) ||
+    (req.headers.authorization as string)?.split(' ')[1];
+
+  if (!resendToken) {
+    throw new AppError(StatusCodes.UNAUTHORIZED, 'Resend token is required');
+  }
+
+  const result = await AdminService.adminResendOtpToDB(resendToken);
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,

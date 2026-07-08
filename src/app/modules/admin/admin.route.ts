@@ -20,7 +20,7 @@ router.post(
 
 // Admin password reset (OTP-based) - returns admin data
 router.post(
-  '/forget-password',
+  '/forgot-password',
   validateRequest(AdminValidation.createForgetPasswordZodSchema),
   AdminController.adminForgetPassword
 );

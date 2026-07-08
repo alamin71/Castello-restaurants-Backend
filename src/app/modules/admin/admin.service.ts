@@ -125,9 +125,8 @@ const adminResetPasswordToDB = async (
   return AuthService.resetPasswordToDB(token, payload);
 };
 
-const adminResendOtpToDB = async (email: string) => {
-  await ensureAdminUserByEmail(email);
-  return AuthService.resendOtpFromDb(email, false);
+const adminResendOtpToDB = async (token: string) => {
+  return AuthService.resendOtpFromDb(token, true);
 };
 
 const changePasswordForAdminInDB = async (

@@ -28,9 +28,7 @@ const createForgetPasswordZodSchema = z.object({
 });
 
 const createResendOtpZodSchema = z.object({
-  body: z.object({
-    email: z.string().email({ message: 'Invalid email address' }),
-  }),
+  body: z.object({}),
 });
 
 const createVerifyResetOtpZodSchema = z.object({

@@ -163,7 +163,7 @@ const forgetPasswordToDB = async (email: string) => {
   }
 
   //send mail
-  const otp = generateOTP(4);
+  const otp = generateOTP(6);
   const value = { otp, email: isExistUser.email! };
   const forgetPassword = emailTemplate.resetPassword(value);
   emailHelper.sendEmail(forgetPassword);
