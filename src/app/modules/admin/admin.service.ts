@@ -6,6 +6,7 @@ import { User } from '../user/user.model';
 import { JwtPayload } from 'jsonwebtoken';
 import { AuthService } from '../auth/auth.service';
 import { USER_ROLES } from '../../../enums/user';
+import { deleteFromS3 } from '../../../helpers/s3Helper';
 import {
   IAuthResetPassword,
   IChangePassword,
@@ -136,15 +137,21 @@ const changePasswordForAdminInDB = async (
   return AuthService.changePasswordToDB(admin, payload);
 };
 const removeProfilePhotoFromDB = async (admin: JwtPayload) => {
-  const updatedAdmin = await User.findByIdAndUpdate(
-    admin.id,
-    { profileImage: '' },
-    { new: true, runValidators: true }
-  );
-
-  if (!updatedAdmin) {
+  const existing = await User.findById(admin.id);
+  if (!existing) {
     throw new AppError(StatusCodes.NOT_FOUND, 'Admin not found');
   }
+
+  // Delete from S3 if image exists
+  if (existing.image) {
+    await deleteFromS3(existing.image);
+  }
+
+  const updatedAdmin = await User.findByIdAndUpdate(
+    admin.id,
+    { image: '' },
+    { new: true }
+  );
 
   return updatedAdmin;
 };
