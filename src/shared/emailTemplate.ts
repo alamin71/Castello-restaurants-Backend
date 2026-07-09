@@ -18,7 +18,7 @@ const createAccount = (values: ICreateAccount) => {
     html: `<body style="font-family: Arial, sans-serif; background-color: #f9f9f9; margin: 50px; padding: 20px; color: #555;">
     <div style="width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); text-align: center;">
         <div style="background-color: #1C1C1C; padding: 20px; border-radius: 8px 8px 0 0; margin: -20px -20px 20px -20px; text-align: center;">
-          <img src="${LOGO_URL}" alt="Logo" style="width:150px;" />
+          <img src="${LOGO_URL}" alt="Castello" width="150" style="display:block; margin:0 auto; max-width:150px;" />
         </div>
           <h2 style="color: #E8500A; font-size: 24px; margin-bottom: 20px;">Welcome ${values.name}!</h2>
         <div style="text-align: center;">
@@ -40,7 +40,7 @@ const contact = (values: IContact) => {
     html: `<body style="font-family: Arial, sans-serif; background-color: #f9f9f9; margin: 50px; padding: 20px; color: #555;">      
       <div style="width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
           <div style="background-color: #1C1C1C; padding: 20px; border-radius: 8px 8px 0 0; margin: -20px -20px 20px -20px; text-align: center;">
-          <img src="${LOGO_URL}" alt="Logo" style="width:150px;" />
+          <img src="${LOGO_URL}" alt="Castello" width="150" style="display:block; margin:0 auto; max-width:150px;" />
         </div>
           <h2 style="color: #E8500A; font-size: 24px; margin-bottom: 20px; text-align: center;">Hi ${values.name}, thanks for contacting us.</h2>
           
@@ -98,7 +98,7 @@ const resetPasswordByUrl = (values: IResetPasswordByEmail) => {
     html: `<body style="font-family: Arial, sans-serif; background-color: #f9f9f9; margin: 50px; padding: 20px; color: #555;">
       <div style="width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
         <div style="background-color: #1C1C1C; padding: 20px; border-radius: 8px 8px 0 0; margin: -20px -20px 20px -20px; text-align: center;">
-          <img src="${LOGO_URL}" alt="Logo" style="width:150px;" />
+          <img src="${LOGO_URL}" alt="Castello" width="150" style="display:block; margin:0 auto; max-width:150px;" />
         </div>
         <div style="text-align: center;">
           <h2 style="color: #333;">Reset Your Password</h2>
@@ -144,7 +144,7 @@ const emailChangeOtp = (values: IEmailChangeOtp) => {
     html: `<body style="font-family: Arial, sans-serif; background-color: #f9f9f9; margin: 50px; padding: 20px; color: #555;">
     <div style="width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); text-align: center;">
         <div style="background-color: #1C1C1C; padding: 20px; border-radius: 8px 8px 0 0; margin: -20px -20px 20px -20px; text-align: center;">
-          <img src="${LOGO_URL}" alt="Logo" style="width:150px;" />
+          <img src="${LOGO_URL}" alt="Castello" width="150" style="display:block; margin:0 auto; max-width:150px;" />
         </div>
         <h2 style="color: #E8500A; font-size: 24px; margin-bottom: 20px;">Email Change Verification</h2>
         <div style="text-align: center;">
