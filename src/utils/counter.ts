@@ -10,7 +10,7 @@ const Counter = model('Counter', counterSchema);
 export const getNextSequence = async (name: string): Promise<number> => {
   const counter = await Counter.findByIdAndUpdate(
     name,
-    { $inc: { seq: 1 } },
+    [{ $set: { seq: { $add: [{ $ifNull: ['$seq', 10000] }, 1] } } }],
     { new: true, upsert: true }
   );
   return counter!.seq;
