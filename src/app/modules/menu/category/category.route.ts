@@ -9,7 +9,6 @@ import { CategoryValidation } from './category.validation';
 const router = express.Router();
 
 router.get('/', CategoryController.getCategories);
-router.get('/:id', CategoryController.getCategoryById);
 
 router.post(
   '/',
@@ -18,6 +17,15 @@ router.post(
   validateRequest(CategoryValidation.createCategorySchema),
   CategoryController.createCategory
 );
+
+router.patch(
+  '/reorder',
+  auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  validateRequest(CategoryValidation.reorderCategorySchema),
+  CategoryController.reorderCategories
+);
+
+router.get('/:id', CategoryController.getCategoryById);
 
 router.patch(
   '/:id',

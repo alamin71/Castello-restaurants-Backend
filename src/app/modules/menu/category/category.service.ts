@@ -5,6 +5,7 @@ import { generateCategoryId } from '../../../../utils/generateId';
 import { ICategory } from './category.interface';
 import { Category } from './category.model';
 import { Product } from '../product/product.model';
+import mongoose from 'mongoose';
 
 const createCategoryToDB = async (payload: Partial<ICategory>) => {
   const existing = await Category.findOne({
@@ -27,7 +28,7 @@ const createCategoryToDB = async (payload: Partial<ICategory>) => {
 };
 
 const getCategoriesFromDB = async (query: Record<string, unknown>) => {
-  const categoryQuery = new QueryBuilder(Category.find(), query)
+  const categoryQuery = new QueryBuilder(Category.find().sort({ sortOrder: 1 }), query)
     .search(['name'])
     .filter()
     .sort()
@@ -111,6 +112,17 @@ const toggleCategoryStatusInDB = async (id: string) => {
   return Category.findByIdAndUpdate(id, { status: newStatus }, { new: true });
 };
 
+const reorderCategoriesInDB = async (orderedIds: string[]) => {
+  const bulkOps = orderedIds.map((id, index) => ({
+    updateOne: {
+      filter: { _id: new mongoose.Types.ObjectId(id) },
+      update: { $set: { sortOrder: index } },
+    },
+  }));
+
+  await Category.bulkWrite(bulkOps);
+};
+
 export const CategoryService = {
   createCategoryToDB,
   getCategoriesFromDB,
@@ -118,4 +130,5 @@ export const CategoryService = {
   updateCategoryInDB,
   deleteCategoryFromDB,
   toggleCategoryStatusInDB,
+  reorderCategoriesInDB,
 };

@@ -80,6 +80,17 @@ const toggleCategoryStatus = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const reorderCategories = catchAsync(async (req: Request, res: Response) => {
+  const { orderedIds } = req.body;
+  await CategoryService.reorderCategoriesInDB(orderedIds);
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Categories reordered successfully',
+    data: null,
+  });
+});
+
 export const CategoryController = {
   createCategory,
   getCategories,
@@ -87,4 +98,5 @@ export const CategoryController = {
   updateCategory,
   deleteCategory,
   toggleCategoryStatus,
+  reorderCategories,
 };

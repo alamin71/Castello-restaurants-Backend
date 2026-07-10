@@ -13,7 +13,14 @@ const updateCategorySchema = z.object({
   }),
 });
 
+const reorderCategorySchema = z.object({
+  body: z.object({
+    orderedIds: z.array(z.string()).min(1, 'orderedIds is required'),
+  }),
+});
+
 export const CategoryValidation = {
   createCategorySchema,
   updateCategorySchema,
+  reorderCategorySchema,
 };

@@ -6,4 +6,5 @@ export interface ICategory {
   image: string;
   status: TStatus;
   isDeleted: boolean;
+  sortOrder: number;
 }

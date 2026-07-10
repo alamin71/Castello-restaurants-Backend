@@ -8,6 +8,7 @@ const categorySchema = new Schema<ICategory>(
     image:      { type: String, default: '' },
     status:     { type: String, enum: ['active', 'inactive'], default: 'active' },
     isDeleted:  { type: Boolean, default: false },
+    sortOrder:  { type: Number, default: 0 },
   },
   { timestamps: true }
 );
