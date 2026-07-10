@@ -27,7 +27,7 @@ const createToppingCategoryToDB = async (payload: Partial<IToppingCategory>) => 
 
 const getToppingCategoriesFromDB = async (query: Record<string, unknown>) => {
   const q = new QueryBuilder(ToppingCategory.find(), query)
-    .search(['name'])
+    .search(['name', 'toppingCategoryId'])
     .filter()
     .sort()
     .paginate()
@@ -115,7 +115,7 @@ const getToppingItemsFromDB = async (query: Record<string, unknown>) => {
     ToppingItem.find().populate('toppingCategoryId', 'name toppingCategoryId'),
     query
   )
-    .search(['name'])
+    .search(['name', 'toppingItemId'])
     .filter()
     .sort()
     .paginate()

@@ -29,7 +29,7 @@ const createCategoryToDB = async (payload: Partial<ICategory>) => {
 
 const getCategoriesFromDB = async (query: Record<string, unknown>) => {
   const categoryQuery = new QueryBuilder(Category.find().sort({ sortOrder: 1 }), query)
-    .search(['name'])
+    .search(['name', 'categoryId'])
     .filter()
     .sort()
     .paginate()

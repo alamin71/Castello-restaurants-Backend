@@ -35,7 +35,7 @@ const getProductsFromDB = async (query: Record<string, unknown>) => {
     Product.find().populate('categoryId', 'name categoryId'),
     query
   )
-    .search(['name', 'description'])
+    .search(['name', 'description', 'productId'])
     .filter()
     .sort()
     .paginate()

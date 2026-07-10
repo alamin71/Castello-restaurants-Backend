@@ -32,7 +32,7 @@ const createVariantCategoryToDB = async (payload: Partial<IVariantCategory>) => 
 
 const getVariantCategoriesFromDB = async (query: Record<string, unknown>) => {
   const q = new QueryBuilder(VariantCategory.find(), query)
-    .search(['name'])
+    .search(['name', 'variantCategoryId'])
     .filter()
     .sort()
     .paginate()
@@ -126,7 +126,7 @@ const getVariantItemsFromDB = async (query: Record<string, unknown>) => {
     VariantItem.find().populate('variantCategoryId', 'name variantCategoryId'),
     query
   )
-    .search(['name'])
+    .search(['name', 'variantItemId'])
     .filter()
     .sort()
     .paginate()
