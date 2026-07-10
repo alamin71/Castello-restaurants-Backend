@@ -19,7 +19,7 @@ const createToppingCategoryToDB = async (payload: Partial<IToppingCategory>) => 
     throw new AppError(StatusCodes.CONFLICT, `Topping category name '${payload.name}' already exists`);
   }
 
-  payload.toppingCategoryId = generateToppingCategoryId();
+  payload.toppingCategoryId = await generateToppingCategoryId();
   const category = await ToppingCategory.create(payload);
   if (!category) throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to create topping category');
   return category;
@@ -104,7 +104,7 @@ const createToppingItemToDB = async (payload: Partial<IToppingItem>) => {
     throw new AppError(StatusCodes.CONFLICT, `Topping item name '${payload.name}' already exists in this category`);
   }
 
-  payload.toppingItemId = generateToppingItemId();
+  payload.toppingItemId = await generateToppingItemId();
   const item = await ToppingItem.create(payload);
   if (!item) throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to create topping item');
   return item;

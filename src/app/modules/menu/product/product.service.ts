@@ -11,7 +11,7 @@ const createProductToDB = async (
   payload: Partial<IProduct>,
   variants?: IVariantInput[]
 ) => {
-  payload.productId = generateProductId();
+  payload.productId = await generateProductId();
 
   const product = await Product.create(payload);
   if (!product) throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to create product');

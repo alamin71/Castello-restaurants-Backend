@@ -19,7 +19,7 @@ const createCategoryToDB = async (payload: Partial<ICategory>) => {
     );
   }
 
-  payload.categoryId = generateCategoryId();
+  payload.categoryId = await generateCategoryId();
   const category = await Category.create(payload);
   if (!category) {
     throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to create category');

@@ -22,7 +22,7 @@ const createVariantCategoryToDB = async (payload: Partial<IVariantCategory>) => 
     );
   }
 
-  payload.variantCategoryId = generateVariantCategoryId();
+  payload.variantCategoryId = await generateVariantCategoryId();
   const category = await VariantCategory.create(payload);
   if (!category) {
     throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to create variant category');
@@ -115,7 +115,7 @@ const createVariantItemToDB = async (payload: Partial<IVariantItem>) => {
     );
   }
 
-  payload.variantItemId = generateVariantItemId();
+  payload.variantItemId = await generateVariantItemId();
   const item = await VariantItem.create(payload);
   if (!item) throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to create variant item');
   return item;

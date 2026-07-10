@@ -6,7 +6,7 @@ import { IOffer } from './offer.interface';
 import { Offer } from './offer.model';
 
 const createOfferToDB = async (payload: Partial<IOffer>) => {
-  payload.offerId = generateOfferId();
+  payload.offerId = await generateOfferId();
   if (payload.offerItems) {
     payload.totalItems = payload.offerItems.length;
   }
