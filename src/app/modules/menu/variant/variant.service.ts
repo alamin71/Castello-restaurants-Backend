@@ -50,7 +50,7 @@ const getVariantCategoriesFromDB = async (query: Record<string, unknown>) => {
 
   const result = categories.map((c: any) => ({
     ...c,
-    assignedItems: countMap[c._id.toString()] ?? 0,
+    totalItems: countMap[c._id.toString()] ?? 0,
   }));
 
   return { result, meta };

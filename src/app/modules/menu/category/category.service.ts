@@ -49,7 +49,7 @@ const getCategoriesFromDB = async (query: Record<string, unknown>) => {
 
   const result = categories.map((c: any) => ({
     ...c,
-    assignedProducts: countMap[c._id.toString()] ?? 0,
+    totalProducts: countMap[c._id.toString()] ?? 0,
   }));
 
   return { result, meta };
