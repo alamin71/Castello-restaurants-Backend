@@ -55,18 +55,36 @@ const getProductById = catchAsync(async (req: Request, res: Response) => {
 const updateProduct = catchAsync(async (req: Request, res: Response) => {
   const payload = { ...req.body };
 
+  // Parse removeGallery — can arrive as a single string or array from form-data
+  const removeGallery: string[] = payload.removeGallery
+    ? Array.isArray(payload.removeGallery)
+      ? payload.removeGallery
+      : [payload.removeGallery]
+    : [];
+  delete payload.removeGallery;
+
   const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
   if (files?.mainImage?.[0]) {
     payload.mainImage = await uploadToS3(files.mainImage[0], 'products/main');
   }
-  if (files?.gallery && files.gallery.length > 0) {
-    payload.gallery = await uploadMultipleToS3(files.gallery, 'products/gallery');
-  }
+
+  // Upload new gallery files — do NOT put in payload (service handles append)
+  const newGalleryUrls: string[] =
+    files?.gallery && files.gallery.length > 0
+      ? await uploadMultipleToS3(files.gallery, 'products/gallery')
+      : [];
+  delete payload.gallery;
 
   const variants: IVariantInput[] | undefined = payload.variants;
   delete payload.variants;
 
-  const result = await ProductService.updateProductInDB(req.params.id as string, payload, variants);
+  const result = await ProductService.updateProductInDB(
+    req.params.id as string,
+    payload,
+    variants,
+    newGalleryUrls,
+    removeGallery,
+  );
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,

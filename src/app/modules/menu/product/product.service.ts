@@ -2,6 +2,7 @@ import { StatusCodes } from 'http-status-codes';
 import AppError from '../../../../errors/AppError';
 import QueryBuilder from '../../../builder/QueryBuilder';
 import { generateProductId } from '../../../../utils/generateId';
+import { deleteFromS3 } from '../../../../helpers/s3Helper';
 import { IProduct, IVariantInput } from './product.interface';
 import { Product, ProductVariant } from './product.model';
 import { ToppingCategory } from '../topping/topping.model';
@@ -104,18 +105,34 @@ const getProductByIdFromDB = async (id: string) => {
 const updateProductInDB = async (
   id: string,
   payload: Partial<IProduct>,
-  variants?: IVariantInput[]
+  variants?: IVariantInput[],
+  newGalleryUrls?: string[],
+  removeGallery?: string[]
 ) => {
-  const product = await Product.findByIdAndUpdate(id, payload, {
-    new: true,
-    runValidators: true,
-  });
+  // Step 1: update scalar fields + pull removed gallery URLs
+  const updateOp: Record<string, any> = { $set: payload };
+  if (removeGallery && removeGallery.length > 0) {
+    updateOp.$pull = { gallery: { $in: removeGallery } };
+    // Fire-and-forget S3 deletes (non-fatal)
+    Promise.all(removeGallery.map((url) => deleteFromS3(url)));
+  }
+
+  let product = await Product.findByIdAndUpdate(id, updateOp, { new: true });
   if (!product) throw new AppError(StatusCodes.NOT_FOUND, 'Product not found');
+
+  // Step 2: append new gallery URLs (must be separate op — can't $pull + $push same field)
+  if (newGalleryUrls && newGalleryUrls.length > 0) {
+    product = (await Product.findByIdAndUpdate(
+      id,
+      { $push: { gallery: { $each: newGalleryUrls } } },
+      { new: true }
+    ))!;
+  }
 
   if (variants && variants.length > 0) {
     await ProductVariant.deleteMany({ productId: id });
     const variantDocs = variants.map((v) => ({
-      productId:         product._id,
+      productId:         product!._id,
       variantCategoryId: v.variantCategoryId,
       variantItemId:     v.variantItemId,
       price:             v.price,
