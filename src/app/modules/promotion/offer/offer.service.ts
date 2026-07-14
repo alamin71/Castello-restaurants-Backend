@@ -2,6 +2,7 @@ import { StatusCodes } from 'http-status-codes';
 import AppError from '../../../../errors/AppError';
 import QueryBuilder from '../../../builder/QueryBuilder';
 import { generateOfferId } from '../../../../utils/generateId';
+import { deleteFromS3 } from '../../../../helpers/s3Helper';
 import { IOffer } from './offer.interface';
 import { Offer } from './offer.model';
 
@@ -40,15 +41,33 @@ const getOfferByIdFromDB = async (id: string) => {
   return offer;
 };
 
-const updateOfferInDB = async (id: string, payload: Partial<IOffer>) => {
+const updateOfferInDB = async (
+  id: string,
+  payload: Partial<IOffer>,
+  newGalleryUrls?: string[],
+  removeGallery?: string[]
+) => {
   if (payload.offerItems) {
     payload.totalItems = payload.offerItems.length;
   }
-  const offer = await Offer.findByIdAndUpdate(id, payload, {
-    new: true,
-    runValidators: true,
-  });
+
+  const updateOp: Record<string, any> = { $set: payload };
+  if (removeGallery && removeGallery.length > 0) {
+    updateOp.$pull = { gallery: { $in: removeGallery } };
+    Promise.all(removeGallery.map((url) => deleteFromS3(url)));
+  }
+
+  let offer = await Offer.findByIdAndUpdate(id, updateOp, { new: true });
   if (!offer) throw new AppError(StatusCodes.NOT_FOUND, 'Offer not found');
+
+  if (newGalleryUrls && newGalleryUrls.length > 0) {
+    offer = (await Offer.findByIdAndUpdate(
+      id,
+      { $push: { gallery: { $each: newGalleryUrls } } },
+      { new: true }
+    ))!;
+  }
+
   return offer;
 };
 

@@ -51,15 +51,30 @@ const getOfferById = catchAsync(async (req: Request, res: Response) => {
 const updateOffer = catchAsync(async (req: Request, res: Response) => {
   const payload = { ...req.body };
 
+  const removeGallery: string[] = payload.removeGallery
+    ? Array.isArray(payload.removeGallery)
+      ? payload.removeGallery
+      : [payload.removeGallery]
+    : [];
+  delete payload.removeGallery;
+
   const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
   if (files?.mainImage?.[0]) {
     payload.mainImage = await uploadToS3(files.mainImage[0], 'offers/main');
   }
-  if (files?.gallery && files.gallery.length > 0) {
-    payload.gallery = await uploadMultipleToS3(files.gallery, 'offers/gallery');
-  }
 
-  const result = await OfferService.updateOfferInDB(req.params.id as string, payload);
+  const newGalleryUrls: string[] =
+    files?.gallery && files.gallery.length > 0
+      ? await uploadMultipleToS3(files.gallery, 'offers/gallery')
+      : [];
+  delete payload.gallery;
+
+  const result = await OfferService.updateOfferInDB(
+    req.params.id as string,
+    payload,
+    newGalleryUrls,
+    removeGallery,
+  );
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
