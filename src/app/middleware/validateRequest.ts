@@ -4,12 +4,13 @@ const validateRequest =
   (schema: ZodObject) =>
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      await schema.parseAsync({
+      const parsed = await schema.parseAsync({
         body: req.body,
         params: req.params,
         query: req.query,
         cookies: req.cookies,
       });
+      req.body = parsed.body;
       next();
     } catch (error) {
       next(error);
