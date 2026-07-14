@@ -17,9 +17,15 @@ const createOfferToDB = async (payload: Partial<IOffer>) => {
 };
 
 const getOffersFromDB = async (query: Record<string, unknown>) => {
+  const { availability, ...restQuery } = query as any;
+  const baseFilter: Record<string, any> = {};
+  if (availability && ['website', 'pos', 'kiosk'].includes(availability)) {
+    baseFilter[`availability.${availability}`] = true;
+  }
+
   const q = new QueryBuilder(
-    Offer.find().populate('offerItems.categoryId', 'name categoryId'),
-    query
+    Offer.find(baseFilter).populate('offerItems.categoryId', 'name categoryId'),
+    restQuery
   )
     .search(['title'])
     .filter()

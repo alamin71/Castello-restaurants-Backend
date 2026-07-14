@@ -32,9 +32,15 @@ const createProductToDB = async (
 };
 
 const getProductsFromDB = async (query: Record<string, unknown>) => {
+  const { availability, ...restQuery } = query as any;
+  const baseFilter: Record<string, any> = {};
+  if (availability && ['website', 'pos', 'kiosk'].includes(availability)) {
+    baseFilter[`availability.${availability}`] = true;
+  }
+
   const productQuery = new QueryBuilder(
-    Product.find().populate('categoryId', 'name categoryId'),
-    query
+    Product.find(baseFilter).populate('categoryId', 'name categoryId'),
+    restQuery
   )
     .search(['name', 'description', 'productId'])
     .filter()
