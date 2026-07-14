@@ -46,6 +46,8 @@ const getProductsFromDB = async (query: Record<string, unknown>) => {
   const meta = await productQuery.countTotal();
 
   const productIds = products.map((p: any) => p._id);
+
+  // Batch fetch variants
   const allVariants = await ProductVariant.find({ productId: { $in: productIds } })
     .populate('variantCategoryId', 'name')
     .populate('variantItemId', 'name')
@@ -58,9 +60,26 @@ const getProductsFromDB = async (query: Record<string, unknown>) => {
     variantMap[key].push(v);
   });
 
+  // Batch fetch topping categories and items
+  const allToppingCatIds = [...new Set(products.flatMap((p: any) => p.toppingCategoryIds ?? []).map(String))];
+  const allDefaultItemIds = [...new Set(products.flatMap((p: any) => p.defaultToppingItemIds ?? []).map(String))];
+
+  const [toppingCats, defaultItems] = await Promise.all([
+    ToppingCategory.find({ _id: { $in: allToppingCatIds } }, 'name toppingCategoryId').lean(),
+    ToppingItem.find({ _id: { $in: allDefaultItemIds } }, 'name toppingItemId price').lean(),
+  ]);
+
+  const toppingCatMap: Record<string, any> = {};
+  toppingCats.forEach((c: any) => { toppingCatMap[c._id.toString()] = c; });
+
+  const defaultItemMap: Record<string, any> = {};
+  defaultItems.forEach((i: any) => { defaultItemMap[i._id.toString()] = i; });
+
   const result = products.map((p: any) => ({
     ...p,
     variants: variantMap[p._id.toString()] || [],
+    toppingCategoryIds: (p.toppingCategoryIds ?? []).map((id: any) => toppingCatMap[id.toString()] ?? id),
+    defaultToppingItemIds: (p.defaultToppingItemIds ?? []).map((id: any) => defaultItemMap[id.toString()] ?? id),
   }));
 
   return { result, meta };
