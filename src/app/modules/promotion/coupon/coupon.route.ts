@@ -2,6 +2,7 @@ import express from 'express';
 import { USER_ROLES } from '../../../../enums/user';
 import auth from '../../../middleware/auth';
 import validateRequest from '../../../middleware/validateRequest';
+import { s3FileUploadHandler } from '../../../middleware/s3FileUploadHandler';
 import { CouponController } from './coupon.controller';
 import { CouponValidation } from './coupon.validation';
 
@@ -13,6 +14,7 @@ router.get('/:id', CouponController.getCouponById);
 router.post(
   '/',
   auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  s3FileUploadHandler.none(),
   validateRequest(CouponValidation.createCouponSchema),
   CouponController.createCoupon
 );
@@ -20,6 +22,7 @@ router.post(
 router.patch(
   '/:id',
   auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  s3FileUploadHandler.none(),
   validateRequest(CouponValidation.updateCouponSchema),
   CouponController.updateCoupon
 );
