@@ -28,7 +28,7 @@ const getCoupons = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getCouponById = catchAsync(async (req: Request, res: Response) => {
-  const result = await CouponService.getCouponByIdFromDB(req.params.id);
+  const result = await CouponService.getCouponByIdFromDB(req.params.id as string);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -38,7 +38,7 @@ const getCouponById = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateCoupon = catchAsync(async (req: Request, res: Response) => {
-  const result = await CouponService.updateCouponInDB(req.params.id, req.body);
+  const result = await CouponService.updateCouponInDB(req.params.id as string, req.body);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -48,7 +48,7 @@ const updateCoupon = catchAsync(async (req: Request, res: Response) => {
 });
 
 const deleteCoupon = catchAsync(async (req: Request, res: Response) => {
-  await CouponService.deleteCouponFromDB(req.params.id);
+  await CouponService.deleteCouponFromDB(req.params.id as string);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -58,7 +58,7 @@ const deleteCoupon = catchAsync(async (req: Request, res: Response) => {
 });
 
 const toggleCouponStatus = catchAsync(async (req: Request, res: Response) => {
-  const result = await CouponService.toggleCouponStatusInDB(req.params.id);
+  const result = await CouponService.toggleCouponStatusInDB(req.params.id as string);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
