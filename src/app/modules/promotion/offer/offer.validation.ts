@@ -62,7 +62,8 @@ const updateOfferSchema = z.object({
         takeaway:     z.boolean().optional(),
       }).optional()
     ),
-    status: z.enum(['active', 'inactive']).optional(),
+    status:        z.enum(['active', 'inactive']).optional(),
+    removeGallery: z.union([z.string(), z.array(z.string())]).optional(),
   }),
 });
 
