@@ -7,6 +7,7 @@ import { VariantRouter } from '../app/modules/menu/variant/variant.route';
 import { ToppingRouter } from '../app/modules/menu/topping/topping.route';
 import { ProductRouter } from '../app/modules/menu/product/product.route';
 import { OfferRouter } from '../app/modules/promotion/offer/offer.route';
+import { CouponRouter } from '../app/modules/promotion/coupon/coupon.route';
 
 const router = express.Router();
 
@@ -20,6 +21,7 @@ const routes = [
   { path: '/admin/menu/toppings',        route: ToppingRouter },
   { path: '/admin/menu/products',        route: ProductRouter },
   { path: '/admin/promotions/offers',    route: OfferRouter },
+  { path: '/admin/promotions/coupons',   route: CouponRouter },
 ];
 
 routes.forEach((element) => {

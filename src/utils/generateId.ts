@@ -20,3 +20,6 @@ export const generateToppingItemId = async (): Promise<string> =>
 
 export const generateOfferId = async (): Promise<string> =>
   `OF-${await getNextSequence('offer')}`;
+
+export const generateCouponId = async (): Promise<string> =>
+  `CPN-${await getNextSequence('coupon')}`;
