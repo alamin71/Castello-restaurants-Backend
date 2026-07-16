@@ -8,6 +8,7 @@ import { ToppingRouter } from '../app/modules/menu/topping/topping.route';
 import { ProductRouter } from '../app/modules/menu/product/product.route';
 import { OfferRouter } from '../app/modules/promotion/offer/offer.route';
 import { CouponRouter } from '../app/modules/promotion/coupon/coupon.route';
+import { DiscountRouter } from '../app/modules/promotion/discount/discount.route';
 
 const router = express.Router();
 
@@ -21,7 +22,8 @@ const routes = [
   { path: '/admin/menu/toppings',        route: ToppingRouter },
   { path: '/admin/menu/products',        route: ProductRouter },
   { path: '/admin/promotions/offers',    route: OfferRouter },
-  { path: '/admin/promotions/coupons',   route: CouponRouter },
+  { path: '/admin/promotions/coupons',    route: CouponRouter },
+  { path: '/admin/promotions/discounts',  route: DiscountRouter },
 ];
 
 routes.forEach((element) => {
