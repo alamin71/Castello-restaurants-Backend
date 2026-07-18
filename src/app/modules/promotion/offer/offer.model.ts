@@ -20,8 +20,9 @@ const offerItemSchema = new Schema(
 
 const offerSchema = new Schema<IOffer>(
   {
-    offerId:     { type: String, required: true, unique: true },
-    title:       { type: String, required: true, trim: true },
+    offerId:         { type: String, required: true, unique: true },
+    offerCategoryId: { type: Schema.Types.ObjectId, ref: 'OfferCategory', default: null },
+    title:           { type: String, required: true, trim: true },
     description: { type: String, default: '' },
     price:       { type: Number, required: true, min: 0 },
     mainImage:   { type: String, default: '' },

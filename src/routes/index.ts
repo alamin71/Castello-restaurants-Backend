@@ -9,6 +9,7 @@ import { ProductRouter } from '../app/modules/menu/product/product.route';
 import { OfferRouter } from '../app/modules/promotion/offer/offer.route';
 import { CouponRouter } from '../app/modules/promotion/coupon/coupon.route';
 import { DiscountRouter } from '../app/modules/promotion/discount/discount.route';
+import { OfferCategoryRouter } from '../app/modules/promotion/offerCategory/offerCategory.route';
 
 const router = express.Router();
 
@@ -23,7 +24,8 @@ const routes = [
   { path: '/admin/menu/products',        route: ProductRouter },
   { path: '/admin/promotions/offers',    route: OfferRouter },
   { path: '/admin/promotions/coupons',    route: CouponRouter },
-  { path: '/admin/promotions/discounts',  route: DiscountRouter },
+  { path: '/admin/promotions/discounts',        route: DiscountRouter },
+  { path: '/admin/promotions/offer-categories', route: OfferCategoryRouter },
 ];
 
 routes.forEach((element) => {

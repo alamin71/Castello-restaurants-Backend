@@ -17,21 +17,34 @@ const createOfferToDB = async (payload: Partial<IOffer>) => {
 };
 
 const getOffersFromDB = async (query: Record<string, unknown>) => {
-  const { availability, ...restQuery } = query as any;
+  const { availability, offerCategoryId, productCategoryId, ...restQuery } = query as any;
+
   const baseFilter: Record<string, any> = {};
+
   if (availability && ['website', 'pos', 'kiosk'].includes(availability)) {
     baseFilter[`availability.${availability}`] = true;
   }
 
+  if (offerCategoryId) {
+    baseFilter.offerCategoryId = offerCategoryId;
+  }
+
+  if (productCategoryId) {
+    baseFilter['offerItems.categoryId'] = productCategoryId;
+  }
+
   const q = new QueryBuilder(
-    Offer.find(baseFilter).populate('offerItems.categoryId', 'name categoryId'),
+    Offer.find(baseFilter)
+      .populate('offerCategoryId', 'name offerCategoryId')
+      .populate('offerItems.categoryId', 'name categoryId'),
     restQuery
   )
-    .search(['title'])
+    .search(['title', 'offerId'])
     .filter()
     .sort()
     .paginate()
     .fields();
+
   const result = await q.modelQuery.lean();
   const meta = await q.countTotal();
   return { result, meta };

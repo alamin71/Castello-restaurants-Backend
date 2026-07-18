@@ -26,6 +26,7 @@ export interface IOfferAvailableFor {
 
 export interface IOffer {
   offerId: string;
+  offerCategoryId?: string;
   title: string;
   description: string;
   price: number;

@@ -13,9 +13,10 @@ const offerItemSchema = z.object({
 
 const createOfferSchema = z.object({
   body: z.object({
-    title:       z.string().min(1, 'Offer title is required'),
-    description: z.string().optional().default(''),
-    price:       z.preprocess(Number, z.number().min(0, 'Price is required')),
+    title:           z.string().min(1, 'Offer title is required'),
+    description:     z.string().optional().default(''),
+    price:           z.preprocess(Number, z.number().min(0, 'Price is required')),
+    offerCategoryId: z.string().optional(),
     offerItems: z.preprocess(
       (v) => (typeof v === 'string' ? JSON.parse(v) : v),
       z.array(offerItemSchema).min(1, 'At least one offer item is required')
@@ -40,9 +41,10 @@ const createOfferSchema = z.object({
 
 const updateOfferSchema = z.object({
   body: z.object({
-    title:       z.string().min(1).optional(),
-    description: z.string().optional(),
-    price:       z.preprocess(Number, z.number().min(0)).optional(),
+    title:           z.string().min(1).optional(),
+    description:     z.string().optional(),
+    price:           z.preprocess(Number, z.number().min(0)).optional(),
+    offerCategoryId: z.string().optional(),
     offerItems: z.preprocess(
       (v) => (typeof v === 'string' ? JSON.parse(v) : v),
       z.array(offerItemSchema).optional()

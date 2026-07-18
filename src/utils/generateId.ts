@@ -26,3 +26,6 @@ export const generateCouponId = async (): Promise<string> =>
 
 export const generateDiscountId = async (): Promise<string> =>
   `DIS-${await getNextSequence('discount')}`;
+
+export const generateOfferCategoryId = async (): Promise<string> =>
+  `OC-${await getNextSequence('offerCategory')}`;
